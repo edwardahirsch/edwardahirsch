@@ -1,0 +1,304 @@
+\documentclass[12pt,fleqn,a4paper]{book}
+%
+%
+%
+\usepackage[koi8-r]{inputenc}
+\usepackage[russian,english]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{url}
+\usepackage{EZlist}
+%
+%
+%
+\pagestyle{headings}
+\newtheorem{theorem}{Теорема}[chapter]
+\newtheorem{lemma}{Лемма}[chapter]
+\newtheorem{proposition}{Утверждение}[chapter]
+\newtheorem{fact}{Факт}[chapter]
+\theoremstyle{definition}
+\newtheorem{problem}{Задача}[chapter]
+\newtheorem{exercise}{Упражнение}[chapter]
+\newtheorem{example}{Пример}[chapter]
+\newtheorem{definition}{Определение}[chapter]
+\newtheorem{remark}{Замечание}[chapter]
+\newtheorem{algorithm}{Алгоритм}[chapter]
+\newcommand{\marginnote}[1]{}
+\def\gap{\medskip\centerline{\fbox{\Huge\bfseries{ПРОБЕЛ В КОНСПЕКТЕ.}}}\medskip}
+\advance\headheight by 7pt
+\def\headsep{15mm}
+\newcommand{\lecture}[3]{%
+\def\rightmark{\fbox{\parbox{125mm}{\lecturername: \coursetitle%
+\hfil\phantom{.}}}}
+\def\leftmark{\fbox{\parbox{125mm}{Лекция {#1}. {#2}%
+\hfil\phantom{.}}}}
+\renewcommand\chaptername{Лекция}\renewcommand\thechapter{#1}\chapter{{#2}\\{\small }}
+\thispagestyle{headings}}
+%
+%
+%
+\newcommand\lecturername{Э. А. Гирш}
+\newcommand\coursetitle{``Информатика'' (отд.математики, 1 курс)}
+%
+%
+%
+%
+%
+%
+\begin{document}
+\selectlanguage{russian}
+
+%
+%
+%
+\lecture{2}{Представление данных (I).\\{\small Обзор. Очередь, стек, рекурсия.}}{1:10}
+%
+%
+%
+\section{Обзор}\marginnote{15}
+
+\begin{description}
+\item[Переменная] в компьютере действительно меняет значение.
+На самом деле, переменная --- это место в памяти, в котором
+хранится текущее значение этой переменной.
+
+\item[Подпрограммы] (процедуры, функции).
+Можно вызвать и вернуть управление на следующий оператор.
+Можно передать параметры.
+
+\item[Область действия] переменной --- подпрограмма (главная программа).
+Переменные при каждом вызове подпрограммы --- это разные переменные
+(так же, как и параметры).
+\end{description}
+
+%
+\paragraph{Структуры данных, которые мы изучим:}
+\begin{itemize}
+\item Массив. % [RAM --- почти одно и то же время доступа к любой ячейке --- один шаг]. 
+\item Очередь. 
+\item Стек.
+\item Файл.
+\item Списки (разные).
+\item Деревья (очень разные).
+\item Хеш-таблицы.
+\item \ldots
+\end{itemize}
+
+\medskip
+Структуры данных, в первую очередь, определяются \emph{операциями} над ними,
+а также способом реализации.
+
+Например, единственная легко реализуемая операция над \emph{массивом} --- 
+\texttt{[$\cdot$]} --- получение доступа к элементу с заданным номером.
+Адрес, в котором хранится элемент, легко определить.
+Затем можно считать оттуда элемент или записать туда другой элемент.
+Например, на RAM-машине 
+вычислить адрес требуемого элемента можно всего за одну операцию (сложения),
+его считывание или модификацию также можно проделать всего за одну 
+операцию (с косвенной адресацией).
+
+Напротив, для нахождения в \emph{списке} элемента по его номеру
+придется проделать большое количество операций.
+
+%
+\section{Очередь.}\marginnote{5}
+\begin{description}
+\item[Операции:] 
+кладем в начало, вынимаем из конца (FIFO).
+\item[Реализация] (возможная):
+\begin{itemize}
+\item массив (кольцо), 
+\item указатели на первый занятый и первый свободный элемент
+\end{itemize}
+(\emph{в этом случае} можно реализовать \texttt{[$\cdot$]}).
+\end{description}
+
+%
+\section{Стек, рекурсия.}\label{sec:stack}
+\subsection{Рекурсивные процедуры.}\marginnote{40}
+Рекурсивной называется процедура, вызывающая себя.
+Вообще, вызов (любой) процедуры происходит так:
+во время исполнения программы с шага $s$ происходит переход
+на адрес начала процедуры; 
+вычисления продолжаются 
+(заметим, что при рекурсивном вызове
+<<одни и те же>> локальные переменные в вызываемой и вызывающей
+копиях процедуры имеют разные значения);
+затем происходит возврат на шаг $s+1$.
+
+\begin{example}[числа Фибоначчи]\hfill
+
+\noindent
+function $f$ ($i$ : integer) : integer;\\
+begin
+\begin{itemize}
+\item[]if $i=0$ then return $0$
+\item[]else if $i=1$ then return $1$
+\item[]else return $f(i-1)+f(i-2)$;
+\end{itemize}
+end;\qed
+\end{example}
+
+\begin{example}[задача о рюкзаке]
+Имеется $N$ предметов и рюкзак объема $V$.
+Даны их объемы $v_i$ и стоимости $g_i$.
+Требуется найти набор предметов максимальной стоимости, помещающийся в рюкзак.
+
+\medskip
+\noindent
+function knapsack ($V,N$ : integer, набор $v_i$ и $g_i$) : набор целых чисел;\\
+var $optG$ : integer = $-1$;\\
+\phantom{var} $opt$ : набор целых чисел = пустой;\\
+begin
+\begin{itemize}
+%
+\item[] for $k:=1$ to $N$ do \ \ if $v_k\leqslant V$ then
+\item[] begin
+\begin{itemize}
+\item[]   $next:=\{k\}\cup
+                 \textrm{knapsack}(V-v_k,N-k,\textrm{набор при $i\geqslant k+1$})$;
+\item[]   $nextG:=\textrm{стоимость}(next)$;
+\item[]   if ($nextG > optG$) then begin $opt:=next$; $optG:=nextG$; end;
+\end{itemize}
+\item[] end;
+\item[] return $opt$;
+\end{itemize}
+end;
+\qed
+\end{example}
+
+\begin{example}[проверка правильности выражения]\hfill
+
+\noindent
+выражение $\equiv$ сумма \texttt{;} \\
+сумма $\equiv$ терм | терм \texttt{+} сумма \\
+терм $\equiv$ буква | \texttt{(} сумма \texttt{)}\\
+
+Например, выражением является $$\texttt{a+(b+(c+d)+e);}$$
+
+Читаем входной поток функцией getnext : char. 
+Процедура getback возвращает символ во входной поток
+(чтобы в следующий раз был прочтен тот же символ).
+
+\medskip
+\noindent
+function expression : boolean;\\
+begin
+\begin{itemize}
+\item[]  if (not sum) return false;
+\item[]  if (not getnext${}=\texttt{';'}$) return false;
+\item[]  return true;
+\end{itemize}
+end;
+
+\medskip
+\noindent
+function sum : boolean; \hfill (* читает сумму \emph{до конца} *)\\
+begin
+\begin{itemize}
+\item[]  if (not term) return false;
+\item[]  if (not getnext${}=\texttt{'+'}$) begin getback; return true; end;
+\item[]  if (not sum) return false;
+\item[]  return true;
+\end{itemize}
+end;
+
+\medskip
+\noindent
+function term : boolean;\\
+begin
+\begin{itemize}
+\item[]  if (getnext in \texttt{['a'..'z']}) return true;\\[-6pt]
+\item[]  if (not getnext${}=\texttt{'('}$) return false;
+\item[]  if (not sum) return false;
+\item[]  if (not getnext${}=\texttt{')'}$) return false;\\[-6pt]
+\item[]  return true;
+\end{itemize}
+end;
+\qed
+\end{example}
+
+\subsection{Реализация рекурсии в компьютере: стек}\marginnote{10}
+
+\paragraph{Стек (LIFO):}\hfill
+
+\begin{description}
+\item[Операции:] PUSH, POP (и, если повезет с реализацией, \texttt{[$\cdot$]}).
+\item[Реализация] (стандартная):
+\begin{itemize}
+\item место в памяти (как массив), 
+\item счетчик: верхушка стека, 
+\end{itemize}
+\end{description}
+
+\paragraph{Реализация рекурсии.}\hfill
+
+\begin{description}
+\item[Вызов процедуры:]\hfill
+\begin{itemize}
+\item PUSH адрес возврата.
+\item PUSH параметры.
+\item GOTO процедура.
+\item Передвинуть счетчик (PUSH 0) на размер памяти, 
+      необходимый для хранения локальных переменных.
+\end{itemize}
+
+\item[Возврат:]\hfill
+\begin{itemize}
+\item Передвинуть счетчик (POP) на размер памяти, 
+      в которой хранились локальные переменные и параметры.
+\item POP адрес возврата и GOTO туда.
+\end{itemize}
+\end{description}
+Передача результата --- зависит от реализации.
+
+
+\subsection{Избавление от рекурсии.}\marginnote{10}
+\subsubsection{Способ 1: при помощи стека.}
+Реализовать стек в массиве.
+
+\subsubsection{Способ 2: динамическое программирование.}
+\begin{example}[числа Фибоначчи]\hfill
+
+\noindent
+function $g$ ($j$ : integer, $p$ : массив) : integer;\\
+begin
+\begin{itemize}
+\item[]if $j=0$ then return $0$
+\item[]else if $j=1$ then return $1$
+\item[]else return $p[j-1]+p[j-2]$;
+\end{itemize}
+end;
+
+\medskip
+\noindent
+function $f$ ($i$ : integer) : integer;\\
+var $a$ : массив;\\ 
+begin
+\begin{itemize}
+\item[]for $j:=1$ to $i$ do $a[j]:=g(j,a)$;
+\item[]return $a[i]$;
+\end{itemize}
+end;\qed
+\end{example}
+
+\begin{example}[задача о рюкзаке]\hfill
+
+\noindent
+Для всех $i$ от $0$ до $V$ и $k$ от $N$ до $0$ последовательно 
+найдем оптимальный набор предметов с $k$-го до $n$-го, 
+который можно уложить в рюкзак объема $i$
+(при этом можно пользоваться уже найденными
+оптимальными наборами для $i'<i$ и $k'>k$).\qed
+\end{example}
+
+\begin{exercise}
+Определить временн\'ую сложность в наихудшем случае всех алгоритмов,
+приведенных в разделе~\ref{sec:stack}.
+\qed
+\end{exercise}
+
+\end{document}
+

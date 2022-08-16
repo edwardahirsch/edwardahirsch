@@ -1,0 +1,65 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+  <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+  <TITLE>BASolver: Compilation</TITLE>
+<body>
+<h2>BASolver</h2>
+
+<table>
+<tr>
+<td width=150 valign=top>
+<p>
+<a href=index.html>Home</a><br>
+<a href=download.html>Download</a><br>
+Compilation<br>
+<a href=using.html>Usage</a><br>
+<a href=dimacs.html>DIMACS format</a><br>
+<a href=rtl.html>ISCAS/RTL format</a><br>
+</td>
+<td width=3 valign=top><img width=1 height=250 src="spacer.gif" alt=""></td>
+<td width=500 valign=top>
+
+<h3>Compilation issues</h3>
+
+<p>At the moment, the mixed boolean-algebraic solver (BASolver) does not 
+have a sophisticated installation system; instead, it is distributed
+in sources which need to be compiled by standard *nix tools.
+
+<p>Software requirements:
+
+<p><ul>
+<li> Gnu C++ compiler (gcc) version 3.0 or newer.
+<li> gnu make.
+<li> boost C++ library version 1.30.2 or newer (available from
+  <a href="http://www.boost.org">http://www.boost.org</a>).
+<li> Gnu gengetopt version 2.5 or newer (available from <a href="http://www.gnu.org">http://www.gnu.org</a>)
+  (please note that your standard C library should support getopt_long 
+  which is the case for Linux glibc. Instructions on how to compile
+  the code on platforms that do not support this call can be found
+  at <a href="http://www.gnu.org/software/gengetopt/no_getopt_long.txt">
+  http://www.gnu.org/software/gengetopt/no_getopt_long.txt</a>).
+<li> our make system relies on the system ability to create symbolic links
+  (any *nix-like operating system does that).
+<li> Documentation is produced by means of doxygen (available from 
+  <a href="http://www.doxygen.org">http://www.doxygen.org</a>).
+<!--li> Benchmark generators need perl version 5.8 or newer.-->
+</ul>
+
+<p>To (re)build basolver, type<br>
+<pre>make [version]</pre>
+in the top-level directory of the solver distribution (not in src/ 
+subdirectory), where version can be either debug (default), profile, release,
+or static (the latter makes a static release version).
+This creates an executable file ./bin/basolver.[version] 
+(however, there is no ".release" suffix for the release version).
+
+<p>To make a library, type
+<pre>make solverlib</pre>
+It creates a file ./bin/basolver.a. 
+Use it together with the header solve.h.
+</td>
+
+</tr>
+</table>
+</body>
+</html>

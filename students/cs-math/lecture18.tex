@@ -1,0 +1,289 @@
+\documentclass[12pt,fleqn,a4paper]{book}
+% 
+% Packages used:
+%
+\usepackage[koi8-r]{inputenc}
+\usepackage[russian,english]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\makeatletter
+\def\@listI {\leftmargin\leftmarginii
+              \labelwidth\leftmarginii
+              \advance\labelwidth-\labelsep
+              \topsep0pt
+              \parsep0pt
+              \itemsep0pt}
+\def\@listii {\leftmargin\leftmarginii
+              \labelwidth\leftmarginii
+              \advance\labelwidth-\labelsep
+              \topsep0pt
+              \parsep0pt
+              \itemsep0pt}
+\def\@listiii{\leftmargin\leftmarginiii
+              \labelwidth\leftmarginiii
+              \advance\labelwidth-\labelsep
+              \topsep0pt
+              \parsep0pt
+              \partopsep0pt
+              \itemsep0pt}
+\def\@listiv {\leftmargin\leftmarginiv
+              \labelwidth\leftmarginiv
+              \advance\labelwidth-\labelsep}
+\def\@listv  {\leftmargin\leftmarginv
+              \labelwidth\leftmarginv
+              \advance\labelwidth-\labelsep}
+\def\@listvi {\leftmargin\leftmarginvi
+              \labelwidth\leftmarginvi
+              \advance\labelwidth-\labelsep}
+\makeatother
+\advance\textheight by 20mm
+%
+% Common customization:
+%
+\pagestyle{headings}
+\newtheorem{theorem}{Теорема}[chapter]
+\newtheorem{question}{Открытый вопрос}[chapter]
+\newtheorem{lemma}{Лемма}[chapter]
+\newtheorem{corollary}{Следствие}[chapter]
+\newtheorem{proposition}{Утверждение}[chapter]
+\newtheorem{fact}{Факт}[chapter]
+\theoremstyle{definition}
+\newtheorem{problem}{Задача}[chapter]
+\newtheorem{exercise}{Упражнение}[chapter]
+\newtheorem{example}{Пример}[chapter]
+\newtheorem{definition}{Определение}[chapter]
+\newtheorem{remark}{Замечание}[chapter]
+\newtheorem{algorithm}{Алгоритм}[chapter]
+\def\gap{\medskip\centerline{\fbox{\Huge\bfseries{ПРОБЕЛ В КОНСПЕКТЕ.}}}\medskip}
+\advance\headheight by 7pt
+\def\headsep{15mm}
+\newcommand{\lecture}[3]{%
+\def\rightmark{\fbox{\parbox{125mm}{\lecturername: \coursetitle%
+\hfil\phantom{.}}}}
+\def\leftmark{\fbox{\parbox{125mm}{Лекция {#1}. {#2}%
+\hfil\phantom{.}}}}
+\renewcommand\chaptername{Лекция}\renewcommand\thechapter{#1}\chapter{{#2}\\{\small (Конспект: {#3})}}
+\thispagestyle{headings}}
+%
+% Things to customize for the course are here:
+%
+\newcommand\lecturername{Э. А. Гирш}
+\newcommand\coursetitle{``Информатика'' (отд. математики, 1 курс)}
+%
+\newcommand{\Retc}{и\;т.\;д.}
+\newcommand{\poly}{\mathrm{poly}}
+%
+\newcommand{\ournote}[1]{\ref{?}\footnote{#1}}
+\renewcommand{\le}{\leqslant}
+\renewcommand{\ge}{\geqslant}
+\newcommand{\step}{\mathop{\longrightarrow}\limits}
+%
+\newcommand\vhdef2
+\newcommand{\hdef}[1]{{\renewcommand\vhdef2{\bfseries{#1}}\renewcommand\vhdef1}}
+\newcommand{\class}[1]{{\ifnum\vhdef=2\mathbf{#1}\else\mathrm{#1}\fi}}
+\newcommand{\lang}[1]{\mathtt{#1}}
+\newcommand{\NP}{\class{NP}}
+\newcommand{\sNP}{\class{\widetilde{NP}}}
+\newcommand{\RP}{\class{RP}}
+\newcommand{\sRP}{\class{\widetilde{RP}}}
+\renewcommand{\P}{\class{P}}
+\newcommand{\sP}{\class{\widetilde{P}}}
+\newcommand{\SAT}{\lang{SAT}}
+\renewcommand{\mod}{\mathrm{mod\ }}
+%
+% The document
+%
+\begin{document}
+\selectlanguage{russian}
+%
+% Lecture title
+%
+\lecture{18}{Параллельные алгоритмы}{К. Орлова}
+%
+\section{Параллельные вычисления}
+
+Введем следующие обозначения:
+\begin{itemize}
+\item $c(n)$ --- количество процессоров,
+\item $T(n)$ --- время работы,
+\item $W(n)=c(n)T(n)$ --- общая работа.
+\end{itemize}
+Заметим, что если у нас есть программа, написанная для $c(n)$ процессоров,
+то мы всегда сможем переписать ее для меньшего количества $c_1(n)$;
+полученная программа будет работать время $O(W(n)/c_1(n))$. 
+
+Модель вычислений можно выбрать, например, такую:
+RAM-машина с $c(n)$ процессорами; у каждого --- одна и та же программа;
+нулевой регистр у каждого свой (перед началом работы там записан
+номер процессора), остальные --- общие.
+У нас может возникнуть проблема коллизий, то есть два процессора 
+решат одновременно записать данные в один регистр. Ее можно решить двумя
+способами:
+\begin{itemize}
+\item запретить такие програмы;
+\item записывать то, что записал процессор с большим номером.
+\end{itemize}
+
+\section{Достижимость в графе}
+
+Пусть $A$ --- матрица смежности.
+Если мы умножим ее булевски на себя, то получим те
+ребра, которые достижимы за два шага. Если в матрицу $A$ записать на диагональ
+единички, то квадрат даст нам вершины, достижимые за два или менее шагов.
+Матрицу $A^2$ умножим ее еще раз на себя: мы получим вершины, достижимые
+за четыре или менее шагов, {\Retc} Итого: нам нужен алгоритм, возводящий 
+$A$ в $(n-1)$-ую (или большую) степень.
+Будем считать\footnote{Ясно, что это несущественно.}, что $n-1=2^k$. 
+\pagebreak
+ 
+\noindent
+$A$\ \ $A$\ \  $A$\ \  $A$ {\ldots} $A$\ \  $A$\\[-9mm]
+\begin{verbatim}
+ \/   \/      \/
+\end{verbatim}
+\ $A^2$\ \ \ \ $A^2$\ \ \ {\ldots}\ \ \ $A^2$\\[-8mm]
+\begin{verbatim}
+..................
+       \/
+\end{verbatim}
+\hspace{12mm}$A^{n-1}$
+
+\bigskip
+$n$ процессоров сделают сие действо за $O(\log(n))$ операций над матрицами.
+Но произведение матриц не есть элементарная операция. 
+Пусть мы хотим умножить матрицы $B$ и $C$, из булево произведение --- $D$;
+тогда 
+$d_{ij} = \mathop{\mbox{\Large$\lor$}}\limits_{k=1}^n b_{ik}\land c_{kj}$ можно 
+вычислить следующим способом:
+\bigskip
+
+\noindent
+$b_{i1}\land c_{1j}$\ \  $b_{i2}\land c_{2j}$ {\ldots} $b_{in}\land c_{nj}$\\[-9mm]
+\begin{verbatim}
+      \ /  ...  \ /
+       \  /   \  /
+        \/     \/
+         \     /
+          \   /
+           \ /
+\end{verbatim}
+\hspace{25mm}$d_{ij}$
+
+\bigskip
+При этом каждый из элементов $d_{ij}$ мы вычисляем на своем наборе
+процессоров.
+За $O(\log(n))$ операций и $n^3$ процессоров мы перемножим две матрицы.
+Всего же мы управимся за время $O(\log^3 n)$ и $O(n^4)$ процессоров.
+
+\section{Максимальное по включению независимое множество}
+
+\begin{definition}
+$V'\subseteq V$ --- \emph{независимое множество} в графе $(V,E)$,
+если $\forall u,v\in V'\ \{u,v\}\notin E$.
+\end{definition}
+\begin{definition}
+Обозначим через $deg(v)$ степень (количество соседей) вершины $v$.
+\end{definition}
+
+\paragraph{Алгоритм.}\hfill
+
+\noindent
+Вход: граф $G=(V,E)$.\\
+Выход: независимое множество $S$.\\[+5mm]
+Инициализация: $S:=\emptyset$.
+
+На каждой итерации мы будем делать следующее.
+\begin{enumerate}
+\item $\forall v\in V$:\\
+   если $deg(v) = 0$, то добавить $v$ в $S$;\\
+   если $deg(v) \neq 0$, то пометить $v$ c вероятностью $1/(2 deg(v))$.
+\item $\forall e\in E$:\\
+если оба конца ребра $e$ помечены,
+то снять пометку с того, у которого степень меньше.
+\item Запихать в $S$ все помеченные вершины.
+\item $V:=V\setminus\{S\cup\mbox{соседи вершин из $S$}\}$
+(при этом надо и $E$ обновить соответственно).
+\end{enumerate}
+Повторять эти шаги будем, пока граф не станет пустым.
+
+\paragraph{Анализ алгоритма.}
+Корректность алгоритма очевидна.
+Шаги этого алгоритма можно выполнять параллельно для всех вершин
+или ребер, при этом (при разумной реализации)
+на один шаг будет тратиться время $O(\log n)$.
+Остается выяснить, сколько будет итераций: если их также
+$O(\log n)$,  то мы получили искомый <<быстрый>> параллельный алгоритм.
+В дальнейшем этот факт не будет доказан полностью; однако, будут приведены
+соображения, подтверждающие это интуитивно.
+
+Будем называть вершину \emph{хорошей}, 
+если $\ge1/3$ ее соседей имеют степень меньшую, чем
+степень этой вершины.
+
+\begin{lemma}\label{lem:par1}
+Пусть $v$ --- хорошая вершина.
+Тогда вероятность, что один из ее соседей помечен $\ge 1-e^{-1/6}$.
+\end{lemma}
+\begin{proof}
+Действительно, вероятность, что это 
+не так, не превосходит $(1-1/2deg(v))^{deg(v)/3}$,
+что, в свою очередь, не больше $e^{-1/6}$.
+\end{proof}
+
+\begin{lemma}\label{lem:par2}
+Вероятность снятия пометки --- не более $1/2$.
+\end{lemma}
+\begin{proof}
+Данная вероятность не превосходит вероятности того, что помечен один из соседей 
+большей степени; что не меньше, чем $deg(v) \cdot 1/(2deg(v))$, то есть $1/2$.
+\end{proof}
+
+\begin{corollary}\label{cor:par1}
+Если $v$ --- хорошая,
+то с вероятностью $\ge (1-e^{-1/6})/2$ хотя бы один из
+ее соседей попадет в $S$.
+\end{corollary}
+
+Ребро $e$ будем называть 
+\emph{хорошим}, если хотя бы один из его концов --- хороший.
+
+\begin{lemma}\label{lem:par3}
+Количество хороших ребер $\ge |E|/2$.
+\end{lemma}
+\begin{proof}
+Направим ребра из вершин с меньшей степенью в вершины с большей\footnote{И
+как угодно для ребер, соединяющих вершины одинаковой степени.}
+(теперь наш граф --- ориентированный; пусть $deg_{in}(v)$ и $deg_{out}(v)$ ---
+входная и выходная степени вершины $v$ соответственно).
+
+Через $E(V_1,V_2)$ обозначим количество ребер, идущих из вершин множества 
+$V_1$ в вершины множества $V_2$;
+пусть
+$V_g$ --- множество всех хороших вершин,
+$V_b$ --- множество всех плохих вершин.
+
+\begin{multline*}
+2E(V_b,V_b)+E(V_b,V_g)+E(V_g,V_b)\le\\
+\sum_{\mbox{$v$ --- плохая}} deg(v) \le\\
+3\sum_{\mbox{$v$ --- плохая}}(deg_{out}(v)-deg_{in}(v))=\\
+3(E(V_b,V_g)+E(V_b,V_b)-E(V_g,V_b)-E(V_b,V_b))\le\\
+3(E(V_b,V_g)+E(V_g,V_b)).
+\end{multline*}
+Сократим начало и конец этого неравенства.
+Итого, у нас хороших ребер больше, чем плохих, а значит, их больше половины.
+\end{proof}
+
+Хороших ребер больше половины; каждое из них пропадает с вероятностью 
+$\ge (1-e^{-1/6})/2$; 
+значит, мат. ожидание количества пропавших ребер 
+$\ge (1-e^{-1/6})|E|/4$.
+Выходит, что на каждой итерации количество ребер сокращается в 
+константное число раз\footnote{Увы, лишь в среднем.
+Поэтому последующий вывод доказывается не так просто.};
+значит, алгоритм будет совершать лишь
+логарифмическое число итераций. 
+
+\end{document}
+

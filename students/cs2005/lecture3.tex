@@ -1,0 +1,341 @@
+\documentclass[12pt,fleqn,a4paper]{book}
+%
+% Packages used:
+%
+\usepackage[koi8-r]{inputenc}
+\usepackage[russian,english]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{url}
+\usepackage{fullpage}
+\advance\textwidth by 5mm
+\makeatletter
+\def\@listI {\leftmargin\leftmarginii
+              \labelwidth\leftmarginii
+              \advance\labelwidth-\labelsep
+              \topsep0pt
+              \parsep0pt
+              \itemsep0pt}
+\def\@listii {\leftmargin\leftmarginii
+              \labelwidth\leftmarginii
+              \advance\labelwidth-\labelsep
+              \topsep0pt
+              \parsep0pt
+              \itemsep0pt}
+\def\@listiii{\leftmargin\leftmarginiii
+              \labelwidth\leftmarginiii
+              \advance\labelwidth-\labelsep
+              \topsep0pt
+              \parsep0pt
+              \partopsep0pt
+              \itemsep0pt}
+\def\@listiv {\leftmargin\leftmarginiv
+              \labelwidth\leftmarginiv
+              \advance\labelwidth-\labelsep}
+\def\@listv  {\leftmargin\leftmarginv
+              \labelwidth\leftmarginv
+              \advance\labelwidth-\labelsep}
+\def\@listvi {\leftmargin\leftmarginvi
+              \labelwidth\leftmarginvi
+              \advance\labelwidth-\labelsep}
+\makeatother
+%
+% Common customization:
+%
+\pagestyle{headings}
+\newtheorem{theorem}{Теорема}[chapter]
+\newtheorem{lemma}{Лемма}[chapter]
+\newtheorem{proposition}{Утверждение}[chapter]
+\newtheorem{fact}{Факт}[chapter]
+\theoremstyle{definition}
+\newtheorem{problem}{Задача}[chapter]
+\newtheorem{exercise}{Упражнение}[chapter]
+\newtheorem{example}{Пример}[chapter]
+\newtheorem{definition}{Определение}[chapter]
+\newtheorem{remark}{Замечание}[chapter]
+\newtheorem{algorithm}{Алгоритм}[chapter]
+\newcommand{\marginnote}[1]{} %{\marginpar{\raggedright\ \fbox{\small #1}}}
+\def\gap{\medskip\centerline{\fbox{\Huge\bfseries{ПРОБЕЛ В КОНСПЕКТЕ.}}}\medskip}
+\advance\headheight by 7pt
+\def\headsep{15mm}
+\newcommand{\lecture}[2]{%
+\def\rightmark{\fbox{\parbox{125mm}{\lecturername: \coursetitle%
+\hfil\phantom{.}}}}
+\def\leftmark{\fbox{\parbox{125mm}{Лекция {#1}. {#2}%
+\hfil\phantom{.}}}}
+\renewcommand\chaptername{Лекция}\renewcommand\thechapter{#1}\chapter{{#2}}
+\thispagestyle{headings}}
+%
+% Things to customize for the course are here:
+%
+\newcommand\lecturername{Э. А. Гирш}
+\newcommand\coursetitle{``Информатика'' (отд. информатики, 1 курс)}
+%
+% Now, this particular lecture definitions:
+%
+%
+% The document
+%
+\begin{document}
+\selectlanguage{russian}
+%
+% Lecture title
+%
+\lecture{3}{Рекурсия и избавление от нее}
+%
+% The lecture
+%
+\section{Рекурсивные процедуры}\marginnote{40}
+Рекурсивной называется процедура, вызывающая себя.
+Вообще, вызов (любой) процедуры происходит так:
+во время исполнения программы с шага $s$ происходит переход
+на адрес начала процедуры; 
+вычисления продолжаются 
+(заметим, что при рекурсивном вызове
+<<одни и те же>> локальные переменные в вызываемой и вызывающей
+копиях процедуры имеют разные значения);
+затем происходит возврат на шаг $s+1$.
+
+\begin{example}[числа Фибоначчи]\hfill
+
+\noindent
+function $f$ ($i$ : integer) : integer;\\
+begin
+\begin{itemize}
+\item[]if $i=0$ then $f:=0$
+\item[]else if $i=1$ then $f:=1$
+\item[]else $f:=f(i-1)+f(i-2)$;
+\end{itemize}
+end;\qed
+\end{example}
+
+\begin{example}[задача о рюкзаке]
+Имеется $N$ предметов и рюкзак объема $U$.
+Даны объемы предметов $v_i$ и стоимости $g_i$.
+Требуется найти набор предметов максимальной стоимости, помещающийся в рюкзак.
+
+\medskip
+\noindent
+function knapsack ($U,N$ : integer, массивы целых чисел $v$ и $g$) :
+набор целых чисел;\\
+var $optG$ : integer = $-1$;\\
+\phantom{var} $nextG$ : integer;\\
+\phantom{var} $opt$ : набор целых чисел = пустой;\\
+\phantom{var} $next$ : набор целых чисел;\\
+\phantom{var} $temp$ : набор целых чисел;\\
+begin
+\begin{itemize}
+%\item[] if $N=0$ then return пустой набор;
+\item[] for $k:=1$ to $N$ do 
+\item[] \hfill{\itshape(*решаем, предмет с каким наименьшим номером берем*)}
+\begin{itemize}
+\item[] if $v[k]\leqslant U$ then
+\item[] begin
+\begin{itemize}
+\item[]   (*вычисляем оптимальный набор для предметов с номерами, большими $k$,*)
+\item[]   \hfill(*при условии, что предмет с номером $k$ мы взяли и $v[k]$ он отнял*)
+\item[]   $temp:=\textrm{knapsack}(U-v[k],N-k,\textrm{части $v$ и $g$ при $i\geqslant k+1$})$;
+\item[]   перенумеровать числа в $temp$, учитывая, что рекурсивный вызов работал не\\\phantom{.}\hfill{}со всеми предметами, и у него была своя нумерация предметов;
+\item[]   $next:=\{k\}\cup temp$;
+\item[]   $nextG:=\textrm{стоимость}(next)$;
+\item[]   if ($nextG > optG$) then begin $opt:=next$; $optG:=nextG$; end;
+\end{itemize}
+\item[] end;
+\end{itemize}
+\item[] $knapsack:=opt$;
+\end{itemize}
+end;
+\qed
+\end{example}
+
+\begin{example}[проверка правильности выражения]\hfill
+
+\noindent
+выражение $\equiv$ сумма \texttt{;} \\
+сумма $\equiv$ терм | терм \texttt{+} сумма \\
+терм $\equiv$ буква | \texttt{(} сумма \texttt{)}\\
+
+Например, выражением является $$\texttt{a+(b+(c+d)+e);}$$
+
+Читаем входной поток функцией getnext : char. 
+Процедура getback возвращает символ во входной поток
+(чтобы в следующий раз был прочтен тот же символ),
+но применить ее можно лишь один раз (вернее, повторное
+применение не приводит к повторному откату).
+Наша задача --- прочесть одно выражение до конца
+и выдать true, если оно корректно;
+либо прочесть до замеченной ошибки и выдать false.
+
+\medskip
+\noindent
+function expression : boolean;\\
+begin
+\begin{itemize}
+\item[]  if (not sum) then expression:=false
+\item[]  else if (not getnext${}=\texttt{';'}$) then expression:=false
+\item[]  else expression:=true;
+\end{itemize}
+end;
+
+\medskip
+\noindent
+function sum : boolean; \hfill (* рекурсивно читает длинную сумму \emph{до конца} *)\\
+begin
+\begin{itemize}
+\item[]  if (not term) then sum:=false
+\item[]  else if (not getnext${}=\texttt{'+'}$) begin getback; sum:=true; end;
+\item[]  else if (not sum) sum:=false;
+\item[]  else sum:=true;
+\end{itemize}
+end;
+
+\medskip
+\noindent
+function term : boolean;\\
+begin
+\begin{itemize}
+\item[]  if (getnext in \texttt{['a'..'z']}) term:=true
+\item[]  else if (not getnext${}=\texttt{'('}$) term:=false
+\item[]  else if (not sum) term:=false
+\item[]  else if (not getnext${}=\texttt{')'}$) term:=false
+\item[]  else term:=true;
+\end{itemize}
+end;
+\qed
+\end{example}
+
+\section{Реализация рекурсии в компьютере: стек}\marginnote{10}
+
+\paragraph{Стек.}
+Вспомним, что стек --- это абстрактная структура данных, имеющая
+операции PUSH, POP, и, если повезет с реализацией, \texttt{[$\cdot$]}.
+Стандартной реализацией стека является 
+\begin{itemize}
+\item непрерывный фрагмент оперативной памяти (его можно рассматривать как массив), 
+\item счетчик: верхушка стека.
+\end{itemize}
+Ясно, что в этом случае реализовать операцию \texttt{[$\cdot$]}
+можно эффективно, причем нумеровать элементы стека можно как снизу,
+так и сверху.
+
+\paragraph{Реализация рекурсии.}\hfill
+
+\begin{description}
+\item[Вызов процедуры:]\hfill
+\begin{itemize}
+\item PUSH адрес возврата.
+\item PUSH параметры.
+\item JUMP процедура.
+\item Передвинуть счетчик (PUSH 0) на размер памяти, 
+      необходимый для хранения локальных переменных.
+\end{itemize}
+
+\item[Возврат:]\hfill
+\begin{itemize}
+\item Передвинуть счетчик (POP, \ldots) на размер памяти, 
+      в которой хранились локальные переменные и параметры.
+\item POP адрес возврата и JUMP туда.
+\end{itemize}
+\end{description}
+Передача результата --- зависит от реализации.
+
+
+\section{Избавление от рекурсии}\marginnote{10}
+\subsubsection{Способ 1: при помощи стека.}
+Реализовать стек в массиве. Решение годится и для РАМ.
+
+\subsubsection{Способ 2: динамическое программирование.}
+\begin{example}[числа Фибоначчи]\hfill
+
+\noindent
+type intarray = массив\footnote{Напомним, что массив --- это структура данных, для которой есть операция $\texttt{[$\cdot$]}$.} целых чисел;
+
+\noindent
+function $g$ ($j$ : integer, $p$ : intarray) : integer;\\
+\phantom{.}\hfill(*В $p$ хранятся числа Фибоначчи с номерами от $0$ до $j-1$,*)\\
+\phantom{.}\hfill(*мы туда дописываем число номер $j$.*)\\
+begin
+\begin{itemize}
+\item[]if $j=0$ then $g:=0$
+\item[]else if $j=1$ then $g:=1$
+\item[]else $g:=p[j-1]+p[j-2]$
+\end{itemize}
+end;
+\newpage
+
+\medskip
+\noindent
+function $f$ ($i$ : integer) : integer;\\
+var $a$ : intarray;\\ 
+begin
+\begin{itemize}
+\item[]for $j:=1$ to $i$ do $a[j]:=g(j,a)$;
+\item[]$f:=a[i]$;
+\end{itemize}
+end;\qed
+\end{example}
+
+\begin{example}[задача о рюкзаке]\hfill
+
+\noindent
+%Для всех $i$ от $0$ до $V$ и $k$ от $N$ до $0$ последовательно 
+%найдем оптимальный набор предметов с $k$-го до $n$-го, 
+%который можно уложить в рюкзак объема $i$
+%(при этом можно пользоваться уже найденными
+%оптимальными наборами для $i'<i$ и $k'>k$).
+Для всех $k$ от $1$ до $N$ и $p$ от $1$ до общей стоимости всех предметов
+последовательно найдем наименьший по объему набор предметов
+общей стоимостью $p$, использующий лишь предметы с $1$ по $k$
+(при этом можно пользоваться уже найденными
+оптимальными наборами для $k'<k$ и $p'<p$).
+
+Чуть более формально,
+
+\bigskip
+\noindent
+function knapsackvalue(\ldots):integer;\\
+var    $k,p$ : integer;\\
+\phantom{var} $W$ : array$[1\texttt{..}N,1\texttt{..}\sum_{i=1}^N g[i]]$ of integer;\\[+3pt]
+\itshape
+(* В $W[k,p]$ подсчитывается минимальный объем, достаточный для
+того,
+чтобы набрать стоимость $p$ при помощи первых $k$ предметов.*)\rm\\[+3pt]
+begin
+\begin{itemize}
+\item[]for $k:=1$ to $N$ do
+\begin{itemize}
+\item[]for $p:=1$ to $\sum_{i=1}^N g[i]$ do
+\item[]\ \ \ \ \ \ $W[k,p] = \min ( v[k] + W[k-1, p - g[k]], W[k-1,p] );$
+\end{itemize}
+\item[]
+\item[]$p:=0;$
+\item[]while $W[k,p+1]\le U$ do
+\begin{itemize}
+\item[] $p:=p+1$;
+\end{itemize}
+\item[]
+\item[]$knapsackvalue:=p$;
+\end{itemize}
+end;
+
+\bigskip
+Чтобы дать еще более формальное решение, следует вставить
+проверку на выход за границы массива и положить
+\[
+W[\ldots, \le\!0] = 0;\quad W[0, >\!0] = +\infty.
+\]
+\qed
+
+\end{example}
+
+\begin{exercise}
+Доработать последний алгоритм так, чтобы он выдавал
+не только стоимость выбранных предметов, но и весь набор,
+и написать полную и корректную программу на Паскале.
+\qed
+\end{exercise}
+
+\end{document}
+

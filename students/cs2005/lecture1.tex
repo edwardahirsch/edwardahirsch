@@ -1,0 +1,298 @@
+\documentclass[12pt,fleqn,a4paper]{book}
+%
+% Packages used:
+%
+\usepackage[koi8-r]{inputenc}
+\usepackage[russian,english]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{url}
+\usepackage{fullpage}
+%\advance\textheight by 1cm
+%\advance\topmargin by -5mm
+%
+% Common customization:
+%
+\pagestyle{headings}
+\newtheorem{theorem}{Теорема}[chapter]
+\newtheorem{lemma}{Лемма}[chapter]
+\newtheorem{proposition}{Утверждение}[chapter]
+\newtheorem{fact}{Факт}[chapter]
+\theoremstyle{definition}
+\newtheorem{problem}{Задача}[chapter]
+\newtheorem{exercise}{Упражнение}[chapter]
+\newtheorem{example}{Пример}[chapter]
+\newtheorem{definition}{Определение}[chapter]
+\newtheorem{remark}{Замечание}[chapter]
+\newtheorem{algorithm}{Алгоритм}[chapter]
+\newcommand{\marginnote}[1]{} %{\marginpar{\raggedright\ \fbox{\small #1}}}
+\def\gap{\medskip\centerline{\fbox{\Huge\bfseries{ПРОБЕЛ В КОНСПЕКТЕ.}}}\medskip}
+\advance\headheight by 7pt
+\def\headsep{15mm}
+\newcommand{\lecture}[2]{%
+\def\rightmark{\fbox{\parbox{125mm}{\lecturername: \coursetitle%
+\hfil\phantom{.}}}}
+\def\leftmark{\fbox{\parbox{125mm}{\underline{План} лекции {#1}. {#2}%
+\hfil\phantom{.}}}}
+\renewcommand\chaptername{\underline{План} лекции}\renewcommand\thechapter{#1}\chapter{{#2}}
+\thispagestyle{headings}}
+%
+% Things to customize for the course are here:
+%
+\newcommand\lecturername{Э. А. Гирш}
+\newcommand\coursetitle{``Информатика'' (отд. информатики, 1 курс)}
+%
+% Now, this particular lecture definitions:
+%
+%
+% The document
+%
+\begin{document}
+\selectlanguage{russian}
+%
+% Lecture title
+%
+\lecture{1}{Введение в предмет. Литература. Модели вычислений. Сложность алгоритмов}
+%
+% The lecture
+%
+\section{Введение в предмет}\marginnote{5}
+
+\gap
+%\paragraph{Информатика как наука.} Состав: теория алгоритмов (положительные
+%результаты: обычные алгоритмы, вероятностные, параллельные, протоколы,
+%криптография), комбинаторика (в т.ч. теория информации: коды),
+%математическая логика, сложность, технология программирования.
+
+\section{Литература}
+\begin{enumerate}
+\item
+A. V. Aho, J. E. Hopcroft, and J. D. Ullman, \emph{The Design and Analysis of Computer Algorithms}. Addison-Wesley, Reading, MA, 1974. {\bfseries Перевод:} А. Ахо, Дж. Хопкрофт, Дж. Ульман, \emph{Построение и анализ вычислительных алгоритмов}. М.: Мир, 1979.
+\item
+T. H. Cormen, C. E. Leiserson, and R. L. Rivest, \emph{Introduction to Algorithms}. MIT Press/McGraw-Hill, 1990. {\bfseries Перевод:} Т. Кормен, Ч. Лейзерсон, Р. Ривест, \emph{Алгоритмы: построение и анализ}. М.: МЦНМО, 2000.
+\end{enumerate}
+
+\section{Модели вычислений}
+\subsection{Вычислимость}\marginnote{30}
+\paragraph{Алгоритм:}
+\begin{itemize}
+\itemsep0pt
+\item Вход.
+\item Работа (\emph{конечное} число \emph{элементарных} (механических) шагов).
+\item Выход.
+\end{itemize}
+Вычисляет функцию / решает задачу.
+\paragraph{Массовые задачи.}
+Если задача имеет конкретное условие и ответ,
+алгоритм для нее --- это нонсенс
+(например: вычислить $100+200$).
+Следовательно, нас интересуют задачи, где вариантов вопроса много
+(\emph{массовые задачи})
+(каждый вариант --- \emph{индивидуальная задача} (\emph{instance})).
+Наиболее интересны задачи, где вариантов бесконечно много:
+например, найти сумму двух натуральных чисел (чисел ведь
+бесконечно много). Массовая задача --- это совокупность индивидуальных
+задач, т.е. пар (условие, решение); условия и решения можно считать
+битовыми строками. Нас будут интересовать задачи, для которых
+критерий того, является ли данная битовая строка правильным решением, 
+может быть записан в виде, едином для всех условий (и строк, претендующих
+на то, чтобы быть решениями: например, задача о нахождении делителя:
+условие --- целое число, правильное решение --- делитель этого числа).
+
+\paragraph{Модель вычислений ---} формализация понятия алгоритма.
+Чем проще модель вычислений --- тем проще доказывать теоремы.
+
+\paragraph{Тезис Ч\"ерча.}
+Интуитивное понятие вычислимости совпадает с вычислимостью
+согласно <\ldots> (далее можно подставить любую разумную
+формализацию --- например, РАМ, которой мы и будем пользоваться).
+
+\begin{remark}
+У Ч\"ерча фигурировала не РАМ, а другая, эквивалентная ей, модель.
+\end{remark}
+
+\begin{remark}
+Существуют невычислимые (алгоритмически неразрешимые) задачи (мы с ними познакомимся позже).
+\end{remark}
+
+\paragraph{РАМ (Равнодоступная Адресная Машина --- Random Access Machine).}
+\begin{itemize}
+\itemsep0pt
+\item Регистры --- $r_0, r_1, r_2, \ldots$ ---
+каждый может содержать целое число (инициализируются нулями).
+\item Нулевой регистр --- специальный (будет видно ниже). 
+\item Программа состоит из шагов (первый, второй, \ldots),
+      каждый из которых --- команда (см. ниже).
+\item Исполнение программы происходит пошагово
+      (начиная с первого шага).
+      Каждый раз мы переходим к следующему шагу
+      (за исключением команд перехода J\ldots).
+\item У программы есть \emph{вход} (то, что ей дает пользователь;
+      она может его прочесть) и \emph{выход} (то, что она выдает).
+\item Команды (с картинкой перемещений):
+\[
+\begin{array}{lcl}
+\mbox{READ}	&&\mbox{from input}\\
+\mbox{WRITE}    &&\mbox{to output}\\
+\\
+\mbox{LOAD $a$}	&&r_0\longleftarrow a\\
+\mbox{STORE $a$}&&a\longleftarrow r_0\\
+\\
+\mbox{ADD $a$}	&&r_0\longleftarrow r_0+a\\
+\mbox{NEG}	&&\mbox{change sign}\\
+\mbox{LSHIFT $a$}	&&\mbox{left bit shift of $|r_0|$}\\
+\mbox{RSHIFT $a$}	&&\mbox{right bit shift of $|r_0|$}\\
+\\
+\mbox{JUMP b}	&&\mbox{}\\
+\mbox{JGTZ b}	&&\mbox{jump if $r_0>0$}\\
+\mbox{HALT}	&&\mbox{}\\
+\end{array} 
+\]
+\item Способы адресации (с картинкой: $c$, $[c]$, $[[c]]$) --- 
+
+\gap
+\end{itemize}
+
+\begin{remark}
+Компьютер --- не РАМ, так как у него конечная память.
+Чтобы сделать из компьютера ``настоящую'' машину,
+которая может решить любую интуитивно алгоритмически разрешимую задачу,
+надо дополнить его устройством, производящим и подключающим
+новые карты памяти, когда это понадобится.
+\end{remark}
+
+\begin{example}[MULT$(c_1,c_2)$ для неотрицательных $c_1,c_2$]\label{ex:MULT}\hfill\\[+1mm]
+
+\noindent{}Алгоритм:
+\begin{enumerate}
+\item[] Умножаем $c_1$ по очереди на каждый бит $c_2$.
+\end{enumerate}
+Назначение регистров ($k$ --- номер итерации):
+\begin{enumerate}
+\itemsep-3pt
+\item Первое число $c_1$.
+\item Второе число $c_2$, затем $\lfloor c_2 / 2^{k-1} \rfloor$.
+\item $\lfloor c_2 / 2^k\rfloor$. //Пока не обнулится; тогда --- выход.
+\item $c_1 \cdot (c_2 \mod 2^k)$ --- копится ответ.
+\item $c_1\cdot 2^k$.
+\end{enumerate}
+Программа:
+\begin{enumerate}
+\itemsep-3pt
+\item READ 
+\item STORE [1]
+\item STORE [5]
+\item READ \\[+3mm]
+ 
+\item STORE [2] \label{step:cycle}
+\item HALF 
+//Эти шаги вычисляют 
+\item STORE [3]
+//$k$-й бит $c_2$ как 
+$\lfloor c_2/2^{k-1}\rfloor-2\lfloor c_2/2^k\rfloor$\ldots
+\item ADD [3] 
+\item NEG
+\item ADD [2]
+\item JGT \ref{step:bit1}
+\item JUMP \ref{step:bit0}\\[+3mm]
+\item LOAD  [4] \label{step:bit1} //Раз он единица, добавляем $c_1\cdot 2^k$\ldots
+\item ADD [5]
+\item STORE [4]\\[+3mm]
+\item LOAD [5] \label{step:bit0} //Вычисляем $c_1\cdot 2^k$ для очередного $k$\ldots
+\item ADD [5]
+\item STORE [5]
+\item LOAD [3] //Осталось ли что-то от $c_2$?..
+\item JGT \ref{step:cycle}\\[+3mm]
+
+\item LOAD [4]
+\item WRITE
+\item HALT
+\end{enumerate}
+\qed
+\end{example}
+
+
+%
+% The lecture
+%
+\subsection{Эффективность}\marginnote{25}
+\paragraph{Время работы РАМ.}
+\begin{itemize}
+\itemsep0pt
+\item Время работы, конечно, зависит от количества шагов. 
+\item Как считать каждый шаг?
+\begin{itemize}
+\item за единицу --- это называется unit cost,
+\item за длину участвующих в нем чисел (если участвует $[[c]]$,
+надо не забыть учесть длину и $c$, и $r_c$, и $r_{r_c}$) --- это
+называется logarithmic cost, поскольку длина числа $n$ ---
+это $\lceil\log |n|\rceil$ (наличие знака не учитываем --- это всего один бит).
+\end{itemize}
+\item Используемая память: $\max\limits_{\textrm{по времени}}\sum\limits_i\lceil\log r_i\rceil$.
+\end{itemize}
+
+Обычно мы будем иметь в виду logarithmic cost: он более <<честный>>.
+
+Часто мы будем оценивать не время работы РАМ (ее довольно скучно
+выписывать для каждого алгоритма), а количество некоторых элементарных
+операций (например, сравнений и перемещений элементов массива при его
+сортировке). Чтобы получить ``настоящее'' время работы, надо учесть
+время исполнения каждой из этих операций на РАМ. 
+
+\paragraph{Размер входа.} 
+
+Как мы помним, РАМ дается некий \emph{вход} (который
+она может постепенно прочесть при помощи операции READ).
+Если мы при помощи РАМ решаем массовую задачу, то
+на вход мы подаем условие этой задачи: точнее, условие
+одной из входящих в нее индивидуальных задач.
+
+Чем больше это условие, тем дольше, скорее всего, будет работать машина
+(перемножать 1024-битные числа сложнее, чем 2-битные).
+Мы будем интересоваться временем работы машины как
+функцией длины входа (то есть длины битового представления
+такого условия).
+
+Вообще говоря, размер входа зависит от представления данных
+(например, если условие --- граф,
+надо четко описывать, что мы понимаем под графом ---
+матрицу смежности, список ребер или что-то третье).
+
+\paragraph{Асимптотическое поведение алгоритма.}
+Нас будет интересовать, как время работы алгоритма 
+и другие поглощаемые им ресурсы зависят от размера входа:
+\begin{itemize}
+\itemsep0pt
+\item в наихудшем: $T(n)=\max\limits_{\mbox{$I$ размера $n$}} t(I)$,
+\item в среднем (\emph{простейший вариант!}): 
+$$
+T(n)=\frac{\displaystyle\sum\limits_{\mbox{$I$ размера $n$}} t(I)}{\mbox{кол-во таких $I$}}.
+$$
+\end{itemize}
+Исполнение инструкций может занимать разное время
+на разных машинах: может быть
+\begin{itemize}
+\item мультипликативная константа (интерпретация инструкций);
+\item аддитивная константа на startup.
+\end{itemize}
+Поэтому разумно оценивать время с точностью до $O(\ldots)$.
+(Предупреждение: на практике \emph{обе} упомянутые константы могут оказаться существенными: что толку с того, что алгоритм линейный, если startup занимает $2^{100}$ шагов?)
+
+%Более строго, \emph{для функций на $\mathbb{N}$}: 
+%\[
+%f(n)=O(g(n)) \mbox{ iff }
+%\exists a\exists b\forall n (f(n)\le a\cdot g(n)+b).
+%\]
+
+Например, алгоритм~\ref{ex:MULT} работает время 
+$O(\log\max\{c_1,c_2\}\cdot \log c_2)= O(n^2)$,
+поскольку размер входа $n=\lceil\log c_1\rceil + \lceil\log c_2\rceil$.
+
+Иногда мы будем также оценивать время относительно других параметров входа
+(например, можно оценивать время работы алгоритма,
+умножающего квадратные булевы матрицы, относительно длины матрицы).
+
+\end{document}
+

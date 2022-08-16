@@ -1,0 +1,346 @@
+\documentclass[12pt,fleqn,a4paper]{book}
+% 
+% Packages used:
+%
+\usepackage[koi8-r]{inputenc}
+\usepackage[russian,english]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\makeatletter
+\def\@listI {\leftmargin\leftmarginii
+              \labelwidth\leftmarginii
+              \advance\labelwidth-\labelsep
+              \topsep0pt
+              \parsep0pt
+              \itemsep0pt}
+\def\@listii {\leftmargin\leftmarginii
+              \labelwidth\leftmarginii
+              \advance\labelwidth-\labelsep
+              \topsep0pt
+              \parsep0pt
+              \itemsep0pt}
+\def\@listiii{\leftmargin\leftmarginiii
+              \labelwidth\leftmarginiii
+              \advance\labelwidth-\labelsep
+              \topsep0pt
+              \parsep0pt
+              \partopsep0pt
+              \itemsep0pt}
+\def\@listiv {\leftmargin\leftmarginiv
+              \labelwidth\leftmarginiv
+              \advance\labelwidth-\labelsep}
+\def\@listv  {\leftmargin\leftmarginv
+              \labelwidth\leftmarginv
+              \advance\labelwidth-\labelsep}
+\def\@listvi {\leftmargin\leftmarginvi
+              \labelwidth\leftmarginvi
+              \advance\labelwidth-\labelsep}
+\makeatother
+\advance\textheight by 20mm
+%
+% Common customization:
+%
+\pagestyle{headings}
+\newtheorem{theorem}{Теорема}[chapter]
+\newtheorem{question}{Открытый вопрос}[chapter]
+\newtheorem{lemma}{Лемма}[chapter]
+\newtheorem{corollary}{Следствие}[chapter]
+\newtheorem{proposition}{Утверждение}[chapter]
+\newtheorem{fact}{Факт}[chapter]
+\theoremstyle{definition}
+\newtheorem{problem}{Задача}[chapter]
+\newtheorem{exercise}{Упражнение}[chapter]
+\newtheorem{example}{Пример}[chapter]
+\newtheorem{definition}{Определение}[chapter]
+\newtheorem{remark}{Замечание}[chapter]
+\newtheorem{algorithm}{Алгоритм}[chapter]
+\def\gap{\medskip\centerline{\fbox{\Huge\bfseries{ПРОБЕЛ В КОНСПЕКТЕ.}}}\medskip}
+\advance\headheight by 7pt
+\def\headsep{15mm}
+\newcommand{\lecture}[3]{%
+\def\rightmark{\fbox{\parbox{125mm}{\lecturername: \coursetitle%
+\hfil\phantom{.}}}}
+\def\leftmark{\fbox{\parbox{125mm}{Лекция {#1}. {#2}%
+\hfil\phantom{.}}}}
+\renewcommand\chaptername{Лекция}\renewcommand\thechapter{#1}\chapter{{#2}\\{\small (Конспект: {#3})}}
+\thispagestyle{headings}}
+%
+% Things to customize for the course are here:
+%
+\newcommand\lecturername{Э. А. Гирш}
+\newcommand\coursetitle{``Информатика'' (отд. математики, 1 курс)}
+%
+\newcommand{\Retc}{и\;т.\;д.}
+\newcommand{\poly}{\mathrm{poly}}
+%
+\newcommand{\ournote}[1]{\ref{?}\footnote{#1}}
+\renewcommand{\le}{\leqslant}
+\renewcommand{\ge}{\geqslant}
+\newcommand{\step}{\mathop{\longrightarrow}\limits}
+%
+\newcommand\vhdef2
+\newcommand{\hdef}[1]{{\renewcommand\vhdef2{\bfseries{#1}}\renewcommand\vhdef1}}
+\newcommand{\class}[1]{{\ifnum\vhdef=2\mathbf{#1}\else\mathrm{#1}\fi}}
+\newcommand{\lang}[1]{\mathtt{#1}}
+\newcommand{\NP}{\class{NP}}
+\newcommand{\sNP}{\class{\widetilde{NP}}}
+\newcommand{\RP}{\class{RP}}
+\newcommand{\sRP}{\class{\widetilde{RP}}}
+\renewcommand{\P}{\class{P}}
+\newcommand{\sP}{\class{\widetilde{P}}}
+\newcommand{\SAT}{\lang{SAT}}
+\renewcommand{\mod}{\mathrm{mod\ }}
+%
+% The document
+%
+\begin{document}
+\selectlanguage{russian}
+%
+% Lecture title
+%
+\lecture{16}{Алгоритм Ш\"енхаге-Штрассена}{Т. Лазовская}
+
+Сложение $n$-битовых чисел можно осуществить за $O(n)$
+(во-первых, у нас имеется такая инструкция RAM-машины;
+во-вторых, ясно, что это действительно можно реализовать физически).
+Рассмотрим умножение $n$-битовых чисел
+(пусть $n$ --- степень двойки; можно считать так в любом случае,
+так как иначе время работы увеличится не более, чем в константу раз).
+Умножение <<в столбик>> даст, очевидно, время $\Omega(n^2)$.
+Хотелось бы построить более быстрый алгоритм.
+
+Почему мы не включили операцию умножения в RAM-машину?
+Именно потому, что непонятно, как физически реализовать ее так,
+чтобы она работала время $O(n)$.
+Мы могли бы включить другие инструкции (и включим их,
+так как они нам понадобятся): умножение и деление на степень двойки,
+т.е. сдвиг двоичного представления:
+\begin{eqnarray*}
+\mbox{LSHIFT}&&\!\!a,\\
+\mbox{RSHIFT}&&\!\!a
+\end{eqnarray*}
+(содержимое нулевого регистра сдвигается влево или вправо на $a$ битов,
+т.е. умножается или делится на $2^a$; RSHIFT --- обобщение операции HALF).
+Ясно, что эту инструкцию совсем просто реализовать.
+
+\section{Простой алгоритм}
+Начнем с простого алгоритма, время работы которого составляет 
+$O(n^{\log_23})$.
+
+Имеем два $n$-битовых числа $a$ и $b$.
+Разделим их в битовом представлении на $n/2$-битовые $a_1,a_2$ и $b_1,b_2$
+(соответственно), а затем перемножим эти числа рекурсивно:
+\begin{eqnarray*}
+ a&=&a_1\cdot 2^{n/2}+a_2,\\
+ b&=&b_1\cdot 2^{n/2}+b_2,\\
+ a\cdot b&=&a_1b_1\cdot 2^n+(a_1 b_2+a_2 b_1)\cdot 2^{n/2}+a_2 b_2;
+\end{eqnarray*}
+средний коэффициент можно вычислить, используя лишь одно умножение
+и остальные два коэффициента:
+\[
+ a_1 b_2+a_2 b_1=(a_1+a_2)(b_1+b_2)-a_1b_1-a_2b_2.
+\]
+Тем самым получаем, что нам достаточно трех умножений
+$n/2$-битовых чисел (ибо умножение на степень двойки --- по существу,
+не умножение), т.е. рекуррентное уравнение для времени работы ---
+\[
+T(n)\le 3T(n/2)+c n.
+\]
+Тогда (в первой части курса была соответствующая теорема)
+$T(n)=O(n^{\log_23})$.
+\begin{remark}
+Нюанс: строго говоря, мы перемножали не $n/2$-битные,
+а $(n/2+1)$-битные числа $x=a_1+a_2$ и $y=b_1+b_2$,
+но одно к другому сводится за линейное время.
+Действительно, пусть $x=2A+x'$, $y=2B+y'$,
+где $A$ и $B$ --- $n/2$-битные числа, $x'$ и $y'$ --- биты.
+Тогда $xy=4AB+2Ay'+2Bx'+x'y'$.
+<<Сложным>> умножением здесь является только $A\cdot B$;
+остальные <<умножения>> реализуются за линейное время,
+поскольку это умножения на степени двойки или 0.
+\end{remark}
+
+$O(n^{\log_23})$ --- лучше, чем $O(n^2)$,
+но все еще много. Поэтому будем строить другой алгоритм. 
+
+\section{Дискретное преобразование Фурье (ДПФ)}
+
+Пусть $R$ --- кольцо (в нем имеются $0,1,+,\cdot$).
+Будем работать с векторами размерности $n$ над $R$.
+Пусть в $R$ имеется $w$ --- первообразный корень степени $n$ из 1,
+и пусть существует $n^{-1}$.
+
+\begin{definition}
+Для вектора $a=(a_0,a_1,...,a_{n-1})^t$ (в виде столбца)
+определим \emph{преобразование Фурье} от него: 
+\[
+ F(a)=Aa,
+\]
+где $A_{ij}$=$w^{ij}$.
+\emph{Обратное преобразование Фурье} --- преобразование с матрицей
+$(A^{-1})_{ij}=n^{-1}w^{-ij}$.
+\begin{problem}
+Показать, что оно действительно обратное ($A^{-1}A=E$).
+\end{problem}
+\end{definition}
+
+Использовать его мы будем примерно так.
+У нас векторы $a$ и $b$ задают числа
+(а можно считать --- что многочлены).
+Сделаем ДПФ: $a\mapsto F(a)$, $b\mapsto F(b)$.
+После этого перемножим поэлементно $F(a)$ и $F(b)$.
+Получим что-то типа произведения значений многочленов в соответствующих точках;
+затем применим обратное ДПФ и получим искомый результат $ab$.
+
+Сформулируем строгие утверждения.
+\begin{definition}
+Пусть $a=(a_0,\ldots,a_{n-1})^t$, $b=(b_0,...,b_{n-1})^t$.
+Определим новую операцию \emph{свертка} ($\odot$);
+$a\odot b$ --- это $2n$-мерный вектор с элементами
+\[(a\odot b)_i=\sum_{j=0}^{n-1} a_jb_{i-j}\]
+для $0\le i\le 2n-1$; здесь и далее
+элементы, которые не определены (например, $b_{-1}$)
+считаются равными 0.
+\end{definition}
+\begin{remark}
+Коэффициенты свертки равны коэффициентам произведения многочленов
+$\sum_i a_ix^i$ и $\sum_i b_ix^i $.
+\end{remark}
+
+\begin{lemma}\label{lem:odot}
+Дополним $a$ и $b$ до $2n$ элементов:
+$a''=(a_0,\ldots,a_{n-1},0,\ldots,0)^t$,
+$b''=(b_0,\ldots,b_{n-1},0,\ldots,0)^t$.
+Теперь применим ДПФ к каждому из них и перемножим результаты покомпонентно.
+Затем применим обратное ДПФ.
+Так мы получим вектор длины $2n$, равный свертке $a\odot b$.
+\end{lemma}
+\begin{exercise}
+Доказать лемму~\ref{lem:odot}.
+\end{exercise}
+
+\begin{definition}[отрицательно обернутая свертка]
+Это $n$-мерный вектор $a\ominus b$ с элементами
+$(a\ominus b)_i=\sum_{j=0}^i a_j b_{i-j} - \sum_{j=i+1}^{n-1}a_j b_{n+i-j}$.
+\end{definition}
+
+\begin{lemma}\label{lem:ominus}
+Пусть у нас есть не только $w$, но и $\psi$ --- корень из него ($\psi^2=w)$.
+Рассмотрим вектора
+\begin{eqnarray*}
+a'&=&(a_0,a_1\psi,\ldots,a_{n-1}\psi^{n-1}),\\
+b'&=&(b_0,b_1\psi,\ldots,b_{n-1}\psi^{n-1}),\\
+d'&=&(d_0,d_1\psi,\ldots,d_{n-1}\psi^{n-1}),
+\end{eqnarray*}
+где $d_i$ --- коэффициенты отрицательно обернутой свертки ($d=a\ominus b$).
+Утверждение: $d'=F^{-1}(F(a')*F(b'))$,
+где $*$ --- покомпонентное произведение двух векторов.
+\end{lemma}
+\begin{proof}
+Достаточно показать, что $F(a')*F(b')=F(d')$.
+\begin{eqnarray*}
+(F(a'))_i&=&\sum_{j=0}^{n-1}w^{ij} \psi^j a_j,\\
+(F(b'))_i&=&\sum_{j'=0}^{n-1}w^{ij'} \psi^{j'} b_{j'},\\
+(F(d'))_i&=&\sum_{j''=0}^{n-1}w^{ij''}\psi^{j''}
+          \left(\sum_{k=0}^{j''}a_kb_{j''-k} - 
+          \sum_{k=j''+1}^{n-1} a_k b_{n+j''-k}\right).
+\end{eqnarray*}
+Теперь перемножим: 
+\[
+(F(a'))_i*(F(b'))_i=
+\sum_{j=0}^{n-1}\sum_{j'=0}^{n-1} a_jb_{j'}\psi^{j+j'}w^{i(j+j')}.
+\]
+Слагаемые, соответствующие $j+j'<n$, имеются и в $F(d')_i$
+(при этом слагаемое с $\psi^{j+j'}$ соответствует слагаемому с $\psi^{j''}$).
+Заметим, что $\psi^n=-1$, $w^n=1$.
+Поэтому слагаемые, соответствующие $j+j'\ge n$,
+могут быть преобразованы так:
+\[
+a_jb_{j'}\psi^{j+j'}w^{i(j+j')} = - a_jb_{j'}\psi^{j+j'-n}w^{i(j+j'-n)},
+\]
+но это как раз оставшиеся слагаемые из $F(d')_i$
+(теперь слагаемое с $\psi^{j+j'-n}$ соответствует слагаемому с $\psi^{j''}$).
+\end{proof}
+
+\section{Алгоритм Ш\"енхаге-Штрассенa\protect\footnote{A. Sch\"onhage; V. Strassen}}
+
+Достаточно научиться перемножать $n$-битные числа по $\mod(2^n+1)$.
+(Чтобы перемножить точно, можно представить $n$-битные числа как $2n$-битные.)
+Не умаляя общности, можно считать, что $n=2^k$.
+
+Требуется перемножить два $n$-битных числа, $u$ и $v$.
+Разделим их двоичные представления на блоки длиной $l$ битов каждый,
+где $n=lb$, $b=2^{k/2}$ или $b=2^{(k-1)/2}$ (в зависимости от четности $k$). 
+Очевидно, $b$ --- количество блоков.
+\begin{eqnarray*}
+u&=&(u_0,u_1,\ldots,u_{b-1})^t,\\
+v&=&(v_0,v_1,\ldots,v_{b-1})^t,\\
+w&=&(w_0,w_1,\ldots,w_{b-1})^t,\\
+w&=&uv\ \mod(2^n+1) \mbox{ (как числа)}.
+\end{eqnarray*}
+(Если задача тривиальна, т.е. один из сомножителей --- $2^k$,
+этот алгоритм не используют.)
+Нам надо найти $w_i$.
+Рассмотрим $uv$, еще не взятое по модулю $2^n+1$;
+оно состоит из блоков
+\[y_i=\sum_{j=0}^{b-1} u_j v_{i-j};\]
+именно,
+\[
+uv=y_0+y_1\cdot 2^l+\ldots+y_{b-1}\cdot 2^{l(b-1)}+
+y_b\cdot 2^{lb}+\ldots+y_{b+i}\cdot 2^{l(b+i)}+\ldots
+\] 
+Поскольку $2^{lb}\equiv-1\ (\mod 2^n+1)$,
+получаем $w_i=y_i-y_{b+i}$,
+т.е. $w_i$ --- коэффициенты отрицательно обернутой свертки.
+
+Мы знаем для $i<b$, что $0\le y_i\le (1+i)2^{2l}$,
+т.к. в $y_i=\sum_{j=0}^{b-1} u_j v_{i-j}$ всего $1+i$ ненулевых членов.
+Также $0\le y_i\le(b-1-i) 2^{2l}$ для $i\ge b$. 
+Cледовательно, $w_i$ достаточно вычислить по модулю $\ge b2^{2l}$.
+
+Пусть $w'_i=w_i\ \mod b$, $w''_i=w_i\ \mod (2^{2l}+1)$ 
+(одно из них мы вычислим с помощью преобразования Фурье,
+другое --- с помощью первого, <<простого>>, алгоритма).
+Тогда можно найти и
+$w_i=(2^{2l}+1) [(w'_i-w''_i)\mod b]+w''_i$.
+
+\paragraph{Найдем $w''_i$.}
+Рассмотрим кольцо остатков по $\mod(2^{2l}+1)$.
+Пусть $\psi=2^{2l/b}$.
+Убедимся, что он --- корень из первообразного корня степени $b$:
+$\psi^b= 2^{2l}\equiv -1\ (\mod (2^{2l}+1))$.
+Теперь, чтобы найти $w''_i$, можно воспользоваться леммой~\ref{lem:ominus}.
+Для этого надо уметь делить и умножать на степени $\psi$,
+но это легко, поскольку $\psi$ --- степень двойки.
+Кроме того, надо быстро уметь находить преобразование Фурье
+и обратное к нему (перемножать матрицу на вектор --- слишком долго);
+это мы научимся делать на следующей лекции.
+И, наконец, надо поэлементно перемножить два вектора ($F(u')$ и $F(v')$),
+т.е. уметь умножать $2l$-битные числа;
+для этого мы рекурсивно воспользуемся нашим алгоритмом.
+
+\paragraph{Найдем $w'_i$.}
+Воспользуемся первым (<<простым>>) алгоритмом, но --- для всех $w'_i$ сразу.
+Рассмотрим два числa из $3b\log b$ битов:
+\begin{eqnarray*}
+&&|0\ \ \ 0\ \ \ (u_0\ \mod b)|0\ \ \ 0\ \ \ (u_1\ \mod b)|\ldots|,\\
+&&|0\ \ \ 0\ \ \ (v_0\ \mod b)|0\ \ \ 0\ \ \ (v_1\ \mod b)|\ldots|\mbox{ ---}
+\end{eqnarray*}
+дополнили наши числа нулями
+таким образом, чтобы получилось $b$ блоков по $3\log b$ битов.
+Перемножим эти длинные числа <<простым>> алгоритмом и получим 
+\[|y_0\ \mod b|y_1\ \mod b|\ldots|y_{b-1}\ \mod b| \mbox{ ---}\]
+нули мы записывали так, чтобы после перемножения блоки не пересекались.
+Осталось попарно вычесть полученные числа: 
+$w'_i=(y_i\ \mod b-y_{b+i}\ \mod b)\mod b$.
+
+\begin{remark}
+Сложение по модулю степени двойки делается просто.
+\end{remark}
+
+Итак, нам осталось научиться быстро вычислять ДПФ (и обратное к нему)
+и оценить время работы всего алгоритма в целом.
+\end{document}
+

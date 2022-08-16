@@ -1,0 +1,314 @@
+\documentclass[12pt,fleqn,a4paper]{book}
+% 
+% Packages used:
+%
+\usepackage[koi8-r]{inputenc}
+\usepackage[russian,english]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\makeatletter
+\def\@listI {\leftmargin\leftmarginii
+              \labelwidth\leftmarginii
+              \advance\labelwidth-\labelsep
+              \topsep0pt
+              \parsep0pt
+              \itemsep0pt}
+\def\@listii {\leftmargin\leftmarginii
+              \labelwidth\leftmarginii
+              \advance\labelwidth-\labelsep
+              \topsep0pt
+              \parsep0pt
+              \itemsep0pt}
+\def\@listiii{\leftmargin\leftmarginiii
+              \labelwidth\leftmarginiii
+              \advance\labelwidth-\labelsep
+              \topsep0pt
+              \parsep0pt
+              \partopsep0pt
+              \itemsep0pt}
+\def\@listiv {\leftmargin\leftmarginiv
+              \labelwidth\leftmarginiv
+              \advance\labelwidth-\labelsep}
+\def\@listv  {\leftmargin\leftmarginv
+              \labelwidth\leftmarginv
+              \advance\labelwidth-\labelsep}
+\def\@listvi {\leftmargin\leftmarginvi
+              \labelwidth\leftmarginvi
+              \advance\labelwidth-\labelsep}
+\makeatother
+\advance\textheight by 20mm
+%
+% Common customization:
+%
+\pagestyle{headings}
+\newtheorem{theorem}{Теорема}[chapter]
+\newtheorem{question}{Открытый вопрос}[chapter]
+\newtheorem{lemma}{Лемма}[chapter]
+\newtheorem{corollary}{Следствие}[chapter]
+\newtheorem{proposition}{Утверждение}[chapter]
+\newtheorem{fact}{Факт}[chapter]
+\theoremstyle{definition}
+\newtheorem{problem}{Задача}[chapter]
+\newtheorem{exercise}{Упражнение}[chapter]
+\newtheorem{example}{Пример}[chapter]
+\newtheorem{definition}{Определение}[chapter]
+\newtheorem{remark}{Замечание}[chapter]
+\newtheorem{algorithm}{Алгоритм}[chapter]
+\def\gap{\medskip\centerline{\fbox{\Huge\bfseries{ПРОБЕЛ В КОНСПЕКТЕ.}}}\medskip}
+\advance\headheight by 7pt
+\def\headsep{15mm}
+\newcommand{\lecture}[3]{%
+\def\rightmark{\fbox{\parbox{125mm}{\lecturername: \coursetitle%
+\hfil\phantom{.}}}}
+\def\leftmark{\fbox{\parbox{125mm}{Лекция {#1}. {#2}%
+\hfil\phantom{.}}}}
+\renewcommand\chaptername{Лекция}\renewcommand\thechapter{#1}\chapter{{#2}\\{\small (Конспект: {#3})}}
+\thispagestyle{headings}}
+%
+% Things to customize for the course are here:
+%
+\newcommand\lecturername{Э. А. Гирш}
+\newcommand\coursetitle{``Информатика'' (отд. математики, 1 курс)}
+%
+\newcommand{\Retc}{и\;т.\;д.}
+\newcommand{\poly}{\mathrm{poly}}
+%
+\newcommand{\ournote}[1]{\ref{?}\footnote{#1}}
+\renewcommand{\le}{\leqslant}
+\renewcommand{\ge}{\geqslant}
+\newcommand{\step}{\mathop{\longrightarrow}\limits}
+%
+\newcommand\vhdef2
+\newcommand{\hdef}[1]{{\renewcommand\vhdef2{\bfseries{#1}}\renewcommand\vhdef1}}
+\newcommand{\class}[1]{{\ifnum\vhdef=2\mathbf{#1}\else\mathrm{#1}\fi}}
+\newcommand{\lang}[1]{\mathtt{#1}}
+\newcommand{\NP}{\class{NP}}
+\newcommand{\sNP}{\class{\widetilde{NP}}}
+\newcommand{\RP}{\class{RP}}
+\newcommand{\sRP}{\class{\widetilde{RP}}}
+\renewcommand{\P}{\class{P}}
+\newcommand{\sP}{\class{\widetilde{P}}}
+\newcommand{\SAT}{\lang{SAT}}
+\renewcommand{\mod}{\mathrm{mod\ }}
+%
+% The document
+%
+\begin{document}
+\selectlanguage{russian}
+%
+% Lecture title
+%
+\lecture{15}{Приближенные алгоритмы (II). Задача о подстроке}{О. Ионова}
+%
+\section{Задача о покрытии множествами}
+
+\paragraph{Задача.}
+Дано некоторое множество $U=\{u_1,u_2,u_3,\ldots,u_n\}$
+и семейство его подмножеств: $S=\{S_1,S_2,\ldots,S_k\}$, $S_i\subseteq U$,
+каждому из которых сопоставлена стоимость $p_i\ge0$.
+В сумме все эти множества $S_1,\ldots,S_k$ покрывают множество $U$; 
+т.е. $U$ cодержится в объединении этих множеств.
+Задача заключается в том, что нам надо выбрать подмножество 
+множества $S$, покрывающее $U$,
+наименьшей суммарной стоимости.
+Мы предъявим приближенный алгоритм для этой задачи,
+а затем используем его для решения другой
+(более практической) задачи.
+
+\paragraph{Алгоритм.}
+На каждом шаге мы будем пытаться покрыть как можно больше элементов.
+Т.к. некоторые множества стоят дороже,
+мы будем минимизировать удельную стоимость элементов.
+
+\begin{itemize}
+\item[] $I:=\emptyset$;
+\item[] while $\bigcup\limits_{j\in I} S_j\neq U$ do 
+\item[] begin
+\begin{itemize}
+\item[] $\forall i\!\notin\! I\;$ cost[$i$]$:=p_i/|S_i \setminus \bigcup\limits_{k\in I} S_k|$;\\
+\small\it
+(* Знаменатель --- 
+количество элементов,
+которые не были покрыты до сих пор, но будут покрыты данным множеством. 
+Т.е., мы вычислили для каждого множества удельную стоимость
+покрываемых им элементов, теперь выбираем наилучшее по эффективности.*)\\[-3mm]
+\item[]\rm\normalsize Найдем такое $i_0$, что cost[$i_0$]$=\min\limits_{i\notin C}($cost[$i$]$)$;\\
+      $I:=I\cup\{i_0\}$;
+\end{itemize}
+\item[] end;
+\end{itemize}
+
+Теперь докажем, что этот алгоритм 
+является $H_n$-приближенным,
+где $H_n=1+1/2+\ldots+1/n$, а $n=|U|$.
+Для начала мы пронумеруем все элементы множества $u$ 
+в том порядке, как мы их покрывали.
+$U=\{u_1,u_2,\ldots,u_n\}$.
+Каждому $u_i$ из этих элементов мы припишем $c_i$ ---
+ту самую стоимость cost[$i_0$],
+которая была у множества, которым этот элемент впервые покрыли.
+              
+\begin{lemma}
+$c_i< P^*/(n-i+1)$, 
+где $P^*$ --- стоимость оптимального решения задачи.
+\end{lemma}
+\begin{proof}
+Мы собираемся покрыть $i$-ый элемент множества $U$,
+к этому моменту времени у нас уже что-то покрыто, а что-то нет.
+Но мы точно можем покрыть оставшееся при помощи множеств
+%$\{S_i\}_{i\in I^*}$
+общей стоимости $\le P^*$ --- значит, мы можем найти конкретное множество,
+эффективность (cost) которого $\le P^*/|U\setminus\bigcup\limits_{i\in I}S_i|$ 
+(ясно из соображений о среднем).
+Но знаменатель $\ge n-i+1$,
+поскольку мы покрываем $i$-ый элемент, т.е.
+покрыто пока лишь $i-1$ элементов.
+%ведь за каждый шаг покрывается хотя бы один элемент.
+\end{proof}
+
+Теперь при помощи этой леммы докажем, что алгоритм является $H_n$-приближенным.
+Для этого мы должны подсчитать суммарную стоимость нашего решения:
+\[
+\sum_{i\in I}p_i = 
+\sum_{j=1}^n c_j \le
+\frac{P^*}{1+1/2+\ldots+1/n}
+\]
+(равенство --- поскольку все элементы можно разделить между множествами
+ в соответствии с тем, каким множеством элемент был впервые покрыт),
+что и требовалось доказать.
+
+Применим этот алгоритм к решению одной <<биологической>> задачи.
+
+\section{Задача о кратчайшей общей надпоследовательности}
+
+\paragraph{Задача:} дано множество строк $\{s_1,\ldots,s_k\}$;
+нас интересует самая короткая строка $u$, которая 
+содержит в качестве подстроки каждую из $s_i$.
+
+\paragraph{Решение.}
+Сведем к предыдущей задаче.
+Мы должны построить универсальное множество $U$,
+и множество, которое его покрывает.
+Не умаляя общности, можно считать, что среди строк нет подстрок друг друга. 
+Построим строки $w_{ijk}=s_i\cdot s_j[k\!+\!1..|s_j|]$
+для тех $i,j,k$, для которых 
+суффикс $s_i$ длины $k$ совпадает с префиксом $s_j$ длины $k$.
+Для любой строки $s$ определим $\mathrm{set}(s)=\{s_i\;|\;\mbox{$s_i$ --- подстрока $s$}\}$.
+Стоимость множества $\mathrm{set}(s)$ --- длина строки $s$.
+Вход задачи о покрытии ---
+все множества $\mathrm{set}(s_i)$ и $\mathrm{set}(w_{ijk})$.
+(Ясно, что $U=\{s_1,\ldots,s_k\}$.)
+Запускаем алгоритм, он выдает строки, мы их сливаем и получаем строку-ответ.
+То, что алгоритм является $2H_k$-приближенным,
+является очевидным следствием доказанного выше
+про алгоритм для задачи о покрытии множествами
+и следующей леммы.
+
+\begin{lemma}
+Стоимость оптимального решения этой задачи о покрытии
+$\le 2\cdot$длина решения исходной задачи.
+\end{lemma}
+\begin{proof}\hfill
+
+\begin{verbatim}
+         _________________________   s
+         --------- s1
+              -------  s2
+                ---------  s3
+                      ------------  s4                        
+\end{verbatim}
+
+Пусть строка $s$ --- оптимальное решение исходной задачи.
+Перенумеруем $s_i$ в порядке их первого вхождения в строку $s$.
+Очевидно, каждая следующая строка начинается и заканчивается позже предыдущей.
+
+Разделим наши строки на блоки.
+Строим 1-ый блок: берем $s_1$ и все, первые вхождения
+в строку $s$ которых начинаются до конца первого вхождения $s_1$.
+Сделаем из них (точнее, из первой и последней в этом блоке)
+общую строку (например, $w_{1,3,k}$) --- это одно из множеств
+из условия задачи о покрытии.
+
+Строим следующий блок, начиная его с первой невзятой строки, {\Retc}
+Строки, которые мы сконструировали (по одной для каждого блока)
+задают некоторое решение задачи о покрытии множествами.
+Оно может и не быть оптимальным,
+но оптимальное --- разве что еще меньше по стоимости.
+
+Чтобы доказать, что стоимость этого решения --- такая, как в формулировке,
+достаточно показать, что каждый символ строки $s$ входит не более, чем в два блока.
+Однако, в одной позиции может пересекаться не более двух блоков (по построению).
+\end{proof}
+
+\section{Задача о поиске подстроки (pattern matching)}
+
+\paragraph{Задача:} даны строки $p$ (образец --- pattern) 
+и $t$ (текст --- text); $|p|=m$, $|t|=n$.
+Вопрос: встречается ли подстрока $p$ в строке $t$?
+
+\paragraph{Алгоритм.}
+Тривиальный алгоритм работает $O(mn)$ шагов.
+Мы построим алгоритм, которому достаточно $O(m+n)$ шагов.
+
+В алгоритме нам понадобится <<таблица откатов>> $\Pi$,
+\[
+\Pi[q]=\max\{k\;|\; k<q ,\ \mbox{$p[1..k]$ --- суффикс $p[1..q]$\}}
+\]
+(если таких $k$ нет, $\Pi[q]=0$).
+Как вычислить эту таблицу, мы узнаем чуть позже.
+
+\paragraph{Основной алгоритм.}
+У нас будет два <<указателя>> $q$ и $i$; первый указывает
+на текущий элемент образца; второй --- текста.
+\medskip
+
+\begin{itemize}
+\item[] $q:=1$;
+\item[] for $i:= 1$ to $n$ do
+\item[] begin
+\begin{itemize}
+\item[(*)] while $q>1$ and $p[q]\neq t[i]$ do $q:=\Pi[q-1]+1$;
+\item[] if $p[q]=t[i]$ then $q:=q+1$;
+\item[] if $q=m+1$ then <<Нашли!>>;
+\end{itemize}
+\item[] end;
+\end{itemize}
+
+\medskip
+Покажем, что этот алгоритм заканчивает свою работу за \mbox{$O(n)$} шагов.
+Сомнения может вызывать лишь строка (*),
+так как в ней имеется вложенный цикл.
+Однако, в ней уменьшается $q$.
+Увеличиться же оно может лишь $n$ раз для каждого $i$,
+причем всего на единицу.
+Значит и тело цикла (*) не может выполниться более $n$ раз
+за все время работы алгоритма.
+
+\paragraph{Вычисление <<таблицы откатов>> $\Pi$.}
+У нас снова будет два <<указателя>> $k$ и $q$; на сей раз оба
+указывают на текущие элементы образца.
+\medskip
+
+\begin{itemize}
+\item[] $k:=1$;
+\item[] $\Pi[1]:=0$;
+\item[] for $q:=2$ to $m$ do 
+\item[] begin
+\begin{itemize}
+\item[] while $k>1$ and $p[k]\neq p[q]$ do $k:=\Pi[k-1]+1$;
+\item[] if $p[k]=p[q]$ then $k:=k+1$;
+\item[] $\Pi[q]:=k-1$;
+\end{itemize}
+\item[] end;
+\end{itemize}
+
+\medskip
+То, что таблица будет вычислена за $O(m)$ шагов,
+показывается аналогично тому, как это было сделано
+для основного алгоритма (только теперь мы следим
+за <<указателем>> $k$).
+
+\end{document}
+

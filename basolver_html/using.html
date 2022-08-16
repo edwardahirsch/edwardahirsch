@@ -1,0 +1,65 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+  <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+  <TITLE>BASolver: Usage</TITLE>
+<body>
+<h2>BASolver</h2>
+
+<table>
+<tr>
+<td width=150 valign=top>
+<p>
+<a href=index.html>Home</a><br>
+<a href=download.html>Download</a><br>
+<a href=compilation.html>Compilation</a><br>
+Usage<br>
+<a href=dimacs.html>DIMACS format</a><br>
+<a href=rtl.html>ISCAS/RTL format</a><br>
+</td>
+<td width=3 valign=top><img width=1 height=250 src="spacer.gif" alt=""></td>
+<td width=500 valign=top>
+
+<h3>Using the BASolver</h3>
+
+<p>To use the basolver binary, type
+<pre>./bin/basolver[.version] [options] file1 [file2]</pre>
+
+<p>If only one file is given, it has to be in <a href=dimacs.html>DIMACS CNF format</a>. 
+If two files are given, they both have to be in either <a href=rtl.html>ISCAS or RTL</a>
+format (see format description below) and have to contain 
+equal number of inputs and outputs. These two formats allow 
+to conveniently encode arithmetic circuits.
+
+
+<p>Command line options are the following:
+
+<table><tr>
+<td valign=top width=170>--equiv (flag, default=off)</td>
+<td>may be given only with two input files; 
+				if this flag is set, the solver checks the 
+				equivalence of two input circuits: it produces
+				a formula which is unsatisfiable if and only if
+				the two input circuits are equivalent and
+				solves it; if this flag is unset the solver 
+				just adds the equalities stating that all 
+				corresponding inputs and outputs of two input 
+				circuits are equal and solves the resulting set</td></tr>
+
+<tr><td valign=top>--html (flag, default=off)</td>
+<td>prints html output of the solving process
+				to the ./Outputs/ directory</td></tr>
+
+<tr><td valign=top>--nosets (flag, default=off)</td>
+<td>do not write the sets in html output</td></tr>
+
+<tr><td valign=top>--booth (flag, default=off)</td>
+<td>use special rules for Booth multipliers (under
+                                development, currently does not really help)</td></tr>
+				</table>
+
+
+</tr>
+</table>
+
+</body>
+</html>

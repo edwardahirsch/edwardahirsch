@@ -1,0 +1,17 @@
+#!/bin/bash
+
+cd ~/public_html/students/cs
+
+latex $1
+latex $1
+latex $1
+rm $1.log $1.aux
+
+dvips -t a4 $1
+ps2pdf $1.ps $1.pdf
+gzip -9f <$1.ps >$1z.ps.gz
+
+chmod 644 $1.*
+
+ls -l $1*
+
