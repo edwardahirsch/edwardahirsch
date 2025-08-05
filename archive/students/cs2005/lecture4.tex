@@ -1,0 +1,151 @@
+\documentclass[12pt,fleqn,a4paper]{book}
+%
+% Packages used:
+%
+\usepackage[koi8-r]{inputenc}
+\usepackage[russian,english]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{url}
+%\advance\textheight by 1cm
+%\advance\topmargin by -5mm
+%
+% Common customization:
+%
+\pagestyle{headings}
+\newtheorem{theorem}{Теорема}[chapter]
+\newtheorem{lemma}{Лемма}[chapter]
+\newtheorem{proposition}{Утверждение}[chapter]
+\newtheorem{fact}{Факт}[chapter]
+\theoremstyle{definition}
+\newtheorem{problem}{Задача}[chapter]
+\newtheorem{exercise}{Упражнение}[chapter]
+\newtheorem{example}{Пример}[chapter]
+\newtheorem{definition}{Определение}[chapter]
+\newtheorem{remark}{Замечание}[chapter]
+\newtheorem{algorithm}{Алгоритм}[chapter]
+\newcommand{\marginnote}[1]{}%{\marginpar{\raggedright\ \fbox{\small #1}}}
+\def\gap{\medskip\centerline{\fbox{\Huge\bfseries{ПРОБЕЛ В КОНСПЕКТЕ.}}}\medskip}
+\advance\headheight by 7pt
+\def\headsep{15mm}
+\newcommand{\lecture}[2]{%
+\def\rightmark{\fbox{\parbox{125mm}{\lecturername: \coursetitle%
+\hfil\phantom{.}}}}
+\def\leftmark{\fbox{\parbox{125mm}{\underline{План} лекции {#1}. {#2}%
+\hfil\phantom{.}}}}
+\renewcommand\chaptername{\underline{План} лекции}\renewcommand\thechapter{#1}\chapter{{#2}}
+\thispagestyle{headings}}
+%
+% Things to customize for the course are here:
+%
+\newcommand\lecturername{Э. А. Гирш}
+\newcommand\coursetitle{``Информатика'' (отд.информатики, 1 курс)}
+%
+% Now, this particular lecture definitions:
+%
+%
+% The document
+%
+\begin{document}
+\selectlanguage{russian}
+%
+% Lecture title
+%
+\lecture{4}{Словари. Деревья. Красно-черные деревья}
+%
+% The lecture
+%
+\section{Словари}
+Словарь --- структура данных, имеющая операции
+\begin{itemize}
+\item INSERT;
+\item DELETE;
+\item FIND.
+\end{itemize}
+В ближайшее время
+мы изучим один из вариантов реализации словаря --- дерево поиска;
+добиваться будем реализации операций за\linebreak$O(\log(\mbox{количества элементов}))$
+операций над элементами.
+Затем мы изучим другой вариант --- хеш-таблицы.
+
+\section{Деревья}
+\subsection{Определения}
+Граф, дерево, дерево с корнем.
+
+\gap
+
+\subsection{Представление деревьев в компьютере}\marginnote{5}
+Будем говорить о деревьях с корнем.
+
+Имеется много разновидностей структур данных, называемых деревьями.
+Соответственно, и набор операций над деревьями может быть разным.
+Поэтому \emph{представление зависит от требуемых операций}. 
+%(Например, мы уже видели нетрадиционное представление двоичного дерева
+%в виде массива в ситуации, когда перестановки поддеревьев и даже 
+%вставка/удаление не нужны.)
+
+Как представить двоичное дерево, ясно: элемент, соответствующий каждой
+вершине, содержит хранимые данные и два указателя: на левого и правого сына;
+если нужно --- указатель на родителя.
+Для дерева с произвольной степенью вершин имеется несколько вариантов:
+например, список сыновей (полезно указать их количество, а указатель наверх
+хранить в каждом из них).
+
+\begin{remark}
+Динамический массив вместо списка не подойдет --- трудно вставлять!
+\end{remark}
+
+\section{Красно-черные деревья}
+
+Данные будут храниться в вершинах дерева,
+но обращать внимание мы будем только на ключ --- то поле записи,
+по которому ведется поиск. Ключ должен быть элементом некоторого
+линейно упорядоченного множества.
+Даже если исходно данные не представлены в виде дерева, их может быть
+полезно представить в таком виде, если они упорядочены и над ними часто
+приходится выполнять указанные операции.
+
+Свойство 
+\begin{equation}\label{eq:search}
+\mbox{\parbox{95mm}{
+<<все элементы левого поддерева меньше либо равны ключу,
+ключ больше всех элементов правого поддерева>>
+}}
+\end{equation}
+позволяет реализовать FIND за $O(\textrm{высоты дерева})$ операций.
+Если дерево <<идеально>> (высота $h$, количество вершин $2^{h+1}-1$), 
+имеем $O(\log n)$ операций. Ниже мы изучим разновидности деревьев
+поиска, позволяющие поддерживать себя в <<почти идеальном>> виде,
+при этом ограничиваясь логарифмическим количеством операций
+с элементами при реализации операций INSERT и DELETE.
+
+Определение красно-черного дерева, теорема о высоте, реализация
+операции INSERT --- 
+см. книгу Кормена, Лейзерсона и Ривеста.
+
+\gap
+
+\section{Очереди с приоритетами}
+Очередь с приоритетом --- структура данных, имеющая операции
+\begin{itemize}
+\item INSERT;
+\item MAX (показывает элемент с максимальным ключом);
+\item EXTRACT-MAX (показывает и удаляет элемент с максимальным ключом).
+\end{itemize}
+
+Заметим, что красно-черные деревья реализуют очередь с приоритетом
+с логарифмической сложностью всех ее операций. В дальнейшем мы изучим
+и другую реализацию, в которой операции будут реализованы еще эффективнее.
+
+
+\section{Порядковая статистика для красно-черных деревьев}
+
+См. книгу Кормена, Лейзерсона и Ривеста.
+
+\gap
+
+
+\end{document}
+

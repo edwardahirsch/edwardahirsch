@@ -1,0 +1,55 @@
+<HTML>
+<TITLE>E. A. Hirsch --- 
+Worst-case study of local search for MAX-k-SAT </TITLE>
+<BODY>
+<a href="http://logic.pdmi.ras.ru/~hirsch/">Hirsch, E. A.</a>,
+<I><B>Worst-case study of local search for MAX-k-SAT.</B></I><BR>
+<A HREF="http://www.elsevier.nl/locate/dam">Discrete Applied Mathematics</A>
+130/2: 173-184, 2003.
+<BR>
+
+<P><B>Abstract.</B>   
+
+During the past three years there was a considerable growth in the number of 
+algorithms solving MAX-SAT and MAX-2-SAT in worst-case time of the order
+c<SUP>K</SUP>, where c&lt;2 is a constant, and K is the <I>number of clauses</I>
+of the input formula. However, similar bounds w.r.t. the <I>number of variables</I>
+instead of the number of clauses are not known. 
+
+<P>
+Also, it was proved that approximate
+solutions for these problems (even beyond inapproximability ratios)
+can be obtained faster than exact solutions. However, 
+the corresponding exponents still depended on the 
+<I>number of clauses</I> of the input formula.
+In this paper, we give a
+randomized (1-\epsilon)-approximation algorithm
+for MAX-k-SAT whose worst-case time bound depends
+on the <I>number of variables</I>.
+
+<P>
+Our algorithm and its analysis are 
+based on Sch&ouml;ning's proof of the best current
+worst-case time bound for k-SAT [Sch99].
+Similarly to Sch&ouml;ning's algorithm
+(which is also very close to Papadimitriou's algorithm [Pap91]
+and the experimentally successful WalkSAT family by Selman et al. 
+[SKC94,MSK97],
+our algorithm makes random walks of polynomial length.
+We prove that the probability of error in each walk is at most
+1-c<SUB>k,\epsilon</SUB><SUP>-N</SUP>,
+where N is the number of variables,
+and c<SUB>k,\epsilon</SUB>&lt;2 is a constant depending on k and \epsilon.
+Therefore, making 
+\lceil-ln\rho\rceil * c<SUB>k,\epsilon</SUB><SUP>N</SUP> such walks
+gives the probability of error
+bounded from above by any predefined constant \rho&gt;0.
+
+<P>
+Full text (draft): 
+[ <A HREF="../papers/01dam2.ps.gz">.ps.gz</A> (25 Kb) ]
+<HR>
+<A HREF="../papers.html">Back to the list of papers</A>
+
+</BODY>
+</HTML>

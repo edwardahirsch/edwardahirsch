@@ -1,0 +1,595 @@
+\documentclass[12pt,fleqn,a4paper]{book}
+% 
+% Packages used:
+%
+\usepackage[koi8-r]{inputenc}
+\usepackage[russian,english]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{fullpage}
+%
+% Common customization:
+%
+\pagestyle{headings}
+\newtheorem{theorem}{Теорема}[chapter]
+\newtheorem{lemma}{Лемма}[chapter]
+\newtheorem{corollary}{Следствие}[chapter]
+\newtheorem{proposition}{Утверждение}[chapter]
+\newtheorem{fact}{Факт}[chapter]
+\theoremstyle{definition}
+\newtheorem{problem}{Задача}[chapter]
+\newtheorem{exercise}{Упражнение}[chapter]
+\newtheorem{example}{Пример}[chapter]
+\newtheorem{definition}{Определение}[chapter]
+\newtheorem{remark}{Замечание}[chapter]
+\newtheorem{algorithm}{Алгоритм}[chapter]
+\def\gap{\medskip\centerline{\fbox{\Huge\bfseries{ПРОБЕЛ В КОНСПЕКТЕ.}}}\medskip}
+\advance\headheight by 7pt
+\def\headsep{15mm}
+\newcommand{\lecture}[2]{%
+\def\rightmark{\fbox{\parbox{125mm}{\lecturername: \coursetitle%
+\hfil\phantom{.}}}}
+\def\leftmark{\fbox{\parbox{125mm}{Лекция {#1}. {#2}%
+\hfil\phantom{.}}}}
+\renewcommand\chaptername{Лекция}\renewcommand\thechapter{#1}\chapter{{#2}}
+\thispagestyle{headings}}
+%
+% Things to customize for the course are here:
+%
+\newcommand\lecturername{Э. А. Гирш}
+\newcommand\coursetitle{``Информатика'' (отд. информатики, 1 курс)}
+%
+\newcommand{\SAT}{\mathtt{SAT}}
+\newcommand{\RP}{\mathbf{RP}}
+\newcommand{\EXP}{\mathbf{EXP}}
+\newcommand{\PSPACE}{\mathbf{PSPACE}}
+\newcommand{\sRP}{\widetilde{\mathbf{RP}}}
+\newcommand{\NP}{\mathbf{NP}}
+\newcommand{\sNP}{\widetilde{\mathbf{NP}}}
+\renewcommand{\P}{\mathbf{P}}
+\newcommand{\sP}{\widetilde{\mathbf{P}}}
+\newcommand{\DTime}{{\mathbf{DTime}}}
+%
+\newcommand{\Retc}{и\;т.\;д.}
+\newcommand{\poly}{\mathrm{poly}}
+%
+\newcommand{\ournote}[1]{\ref{?}\footnote{#1}}
+\renewcommand{\le}{\leqslant}
+\renewcommand{\ge}{\geqslant}
+\newcommand{\step}{\mathop{\longrightarrow}\limits}
+\renewcommand\mod{\mathrm{mod}\ }
+%
+% The document
+%
+\begin{document}
+\selectlanguage{russian}
+%
+% Lecture title
+%
+\lecture{10}{Вычислимость и сложность}
+\section{Вычислимость}
+\begin{definition}
+Обозначим через $M(x)$ результат работы машины $M$ на входе $x$,
+если она останавливается;
+если же $M$ не останавливается, будем писать $M(x)=\infty$.
+\end{definition}
+
+В дальнейшем мы будем рассматривать языки и массовые задачи
+в некотором конечном алфавите (необязательно $\{0,1\}$),
+но соответствующие обозначения будем опускать
+(будем просто писать <<для любой строки $x$>>,
+подразумевая <<для любой строки $x$ в данном алфавите>>).
+
+\begin{definition}
+Язык $L\subseteq\Sigma^*$ --- \emph{рекурсивно-перечислимый},
+если существует РАМ $M$,
+такая, что $\forall x\in\Sigma^*\ (x \in L \Leftrightarrow M(x)=1)$.
+\end{definition}
+
+\begin{definition}
+Язык $L\subseteq\Sigma^*$ --- \emph{рекурсивный},
+если существует РАМ $M$,
+такая, что $\forall x\in\Sigma^*\ ((x \in L \Leftrightarrow M(x)=1) \land
+(x\notin L \Leftrightarrow M(x)=0))$.
+\end{definition}
+Заметим, что рекурсивные языки --- в точности те,
+для которых проблема принадлежности разрешима.
+\begin{theorem}
+Существует язык, являющийся рекурсивно-перечислимым, но не рекурсивным.
+\end{theorem}
+\begin{lemma}\label{lem:univMT}
+Существует \emph{универсальная РАМ} $U$:
+в начальный момент времени
+в первый регистр $U$ подается описание машины $T$,
+во второй регистр --- вход,
+а выдает она то, что выдала бы машина $T$ на данном входе
+(в частности, зациклится, если $T$ зацикливалась).
+Более того, время работы $U$
+полиномиально зависит от времени работы $T$.
+\end{lemma}
+\begin{exercise}
+Доказать лемму~\ref{lem:univMT}.
+\end{exercise}
+\begin{proof}[Доказательство теоремы.]
+Определим язык $L$ так:
+$(M,x)\in L \Leftrightarrow M(x)=1$.
+Он, очевидно, рекурсивно-перечислимый.
+Покажем, что он не рекурсивный.
+
+Пусть он все же рекурсивный.
+Тогда существует машина $A$, такая, что\\
+$A((M,x))=1 \Leftrightarrow M(x)=1$,\\
+$A((M,x))=0 \Leftrightarrow M(x)\neq 1$.
+
+Построим еще одну машину, $D$, на вход которой подается описание машины $R$:\\
+$D(R)=0$, если $A((R,R))=1$;\\
+$D(R)=1$, если $A((R,R))=0$\\
+(чтобы построить ее, воспользуемся леммой~\ref{lem:univMT}:
+считаем $R$ и запишем $(R,R)$ во второй регистр;
+запишем описание $A$ в первый регистр;
+применим $U$ к $A$ с входом $(R,R)$, предварительно поменяв
+в ее программе все операторы WRITE 0 на WRITE 1, и наоборот).
+
+Чему равно $D(D)$?
+Если $D(D)=1$, то $A((D,D))=0$, т.е. $D(D)\neq 1$ (противоречие).
+Если же $D(D)=0$, то $A((D,D))=1$, т.е. $D(D)=1$ (противоречие).
+По построению не может быть и $D(D)=+\infty$,
+т.е. машины $D$ (а вместе с ней --- и машины $A$) не существует.
+\end{proof} 
+
+
+%
+\section{Элементы теории сложности}
+
+\subsection{Классы $\P$ и $\NP$}
+Пусть $\Sigma$ --- конечный алфавит.
+Напомним, что массовая задача $M$ есть некоторое множество
+индивидуальных задач --- пар $(u,s)$ 
+(где $u,s\in\Sigma^*$,
+ $u$ --- условие,
+ $s$ --- решение).
+
+\begin{definition}
+$M \in \sNP$, если
+\begin{enumerate}
+\item $M$ --- \emph{полиномиально ограничена}, 
+т.е. 
+существует многочлен $p$, такой, что 
+для любого условия $u$, 
+если существует хотя бы одно
+такое $s$, что $(u,s)\in M$,
+то существует и $s'$ длины не более $p(|u|)$,
+такое что $(u,s')\in M$.
+\item M --- \emph{полиномиально проверяема},
+т.е. 
+существует многочлен $p$, 
+существует алгоритм $A$,
+такие, что 
+$\forall u,s\in\Sigma^* ((u,s) \in M \Leftrightarrow A(u,s)=1)$
+и при этом $A$ заканчивает свою работу за время,
+не превосходящее $p(|u|+|s|)$.
+\end{enumerate}
+\end{definition}
+
+\begin{example}
+$\{ (N,m) \;|\; N\vdots m, 1<m<N \}$.
+\end{example}
+
+\begin{example}[{$\widetilde{\SAT}$} (\emph{задача о выполнимости формулы
+логики высказываний})]
+   Дана формула в конъюнктивной нормальной форме
+   (конъюнкция конечного числа дизъюнкций,
+    в каждую из дизъюнкций входят логические переменные либо их отрицания):
+   например, 
+$$\{(x_1 \lor x_2 \lor x_3)\land(\lnot x_1 \lor\lnot x_2)\land
+   (x_4 \lor\lnot x_2)\}.$$
+   Требуется найти значения переменных, такие, что 
+   значение всего выражения --- истина
+   (в приведенном примере: $x_1$ --- истина, $x_2$ --- ложь).
+   Это задача из $\sNP$: решение --- не длиннее условия,
+   и подставить мы его также можем быстро.
+   Формула, для которой такие значения существуют, называется
+   \emph{выполнимой}.
+\qed
+\end{example}
+
+\begin{definition}
+Для каждой массовой задачи $M$ определим язык 
+\[
+L(M)=\{u \;|\; \exists s\ (u,s)\in M\}.
+\]
+Это множество всех условий, для которых существуют решения.
+\end{definition}
+
+\begin{definition}
+Язык $L$ принадлежит классу $\NP$,
+если $\exists M\in\sNP: L=L(M)$.
+\end{definition}
+
+\begin{definition}
+$M\in\sP$,
+если существует многочлен $p$ и существует алгоритм $A$
+(который может выдавать строку из $\Sigma^*$ или
+останавливаться с результатом <<решения нет>>), такие, что
+$A$ работает не дольше, чем $p(\mbox{размер входа})$,
+и решает задачу $M$, т.е.
+\begin{itemize}
+\item $A(u)=s \implies (u,s) \in M$;
+\item $\exists s\ (u,s) \in M \implies A(u) \neq \mbox{<<решения нет>>}$.
+\end{itemize}
+\end{definition}
+
+\begin{definition}
+$L\in\P$,
+если существует многочлен $p$ и существует алгоритм $A$
+(выдающий $0$ или $1$),
+такие, что $A$ работает не дольше, чем $p(\mbox{размер входа})$,
+и $\forall u\in\Sigma^*(A(u)=1 \Leftrightarrow u\in L)$.
+\end{definition}
+
+\begin{remark}
+$\P=\!\!?\!\!\!\!=\NP$ --- центральный (и нерешенный) вопрос теории сложности алгоритмов.
+\end{remark}
+(Гипотеза: $\P \neq \NP$.)
+
+\begin{remark}
+$\P=\NP\iff\sP=\sNP$
+(хотя мы этого доказывать не будем).
+
+При этом вполне может существовать массовая задача $T\in\sNP$,
+такая, что $T\notin\sP$, но $L(T)\in\P$.
+Возможный претендент --- задача о нахождении
+нетривиального делителя (позже мы узнаем,
+что если она $\in\sP$, то криптосистему RSA можно взломать;
+однако, известно, что соответствующий ей язык составных чисел $\in\P$ ---
+это недавний сложный результат, мы его доказывать не будем).
+\end{remark}
+
+\subsection{Сводимости и полнота}
+Заменим вопрос $\P=\!\!?\!\!\!\!=\NP$ на <<более простой>>
+(но эквивалентный исходному).
+
+\begin{definition}
+Язык $L$ \emph{полиномиально сводится} к языку $L'$
+(обозначим это $L\rightarrow L'$), если существует многочлен $p$ и существует алгоритм $A$,
+работающий не дольше, чем $p(\mbox{длина входа})$,
+такие, что $\forall u\!\in\!\Sigma^*\, (A(u) \in L' \Leftrightarrow u\in L)$.
+\end{definition}
+
+\begin{definition}
+Язык называется \emph{$\NP$-трудным}, 
+если любой другой язык из $\NP$ к нему сводится.
+Язык называется $\NP$-полным,
+если он $\NP$-трудный и при этом сам принадлежит $\NP$.
+\end{definition}
+
+\begin{theorem}
+Если $L$ --- $\NP$-полный и $L\in \P$, то $\P=\NP$.
+\end{theorem}
+\begin{proof}
+Очевидно.
+\end{proof}
+
+\begin{theorem}
+$\SAT$ (язык всех выполнимых
+%\footnote{То есть таких,
+%для которых существует набор значений переменных,
+%делающих формулу тождественно истинной:
+%например, значения $x=\texttt{true}$, $y=\texttt{false}$
+%делают формулу $(x\lor y)\land (\lnot x\lor \lnot y)$
+%истинной.}
+формул логики высказываний
+в конъюнктивной нормальной форме) --- $\NP$-полный.
+\end{theorem}
+\begin{proof}
+Напомним, что булева схема --- это \ldots
+
+\gap
+
+CircuitSAT --- это \ldots
+
+\gap
+
+Сначала мы докажем, что CircuitSAT --- $\NP$-полный,
+затем сведем $\SAT$ к CircuitSAT.
+
+\gap
+
+\end{proof}
+
+\begin{corollary}
+Если $\SAT\in P$, то $\P=\NP$.
+\end{corollary}
+
+\begin{remark}
+Задача о неэквивалентости булевых схем является $\NP$-полной
+и легко формулируется в терминах $\SAT$.
+
+\gap
+
+\end{remark}
+
+\subsection{Алгоритмы, использующие случайные числа}
+\begin{definition}
+$M \in \sRP$, если
+\begin{enumerate}
+\item $M$ --- полиномиально ограничена.
+\item $M$ --- полиномиально проверяема.
+\item Каждое разрешимое условие $M$ имеет не менее половины решений,
+т.е.
+\begin{multline*}
+\forall u 
+((\exists t (u,t) \in M)
+\Rightarrow\\
+|\{s \;|\; (u,s)\in M,\; |s|\le p(|u|)\}|
+ \ge\\\frac{1}{2}\cdot\mbox{кол-во всех строк длины не более $p(|u|)$})
+\end{multline*}
+(здесь $|\ldots|$ обозначает в одном случае --- мощность множества,
+а в другом --- длину строки; многочлен $p$ --- тот, что фигурирует
+в определении полиномиальной ограниченности).
+\end{enumerate}
+\end{definition}
+
+\begin{definition}
+$L\in\RP \Leftrightarrow \exists M\in\sRP\ L=L(M)$.
+\end{definition}
+
+Очевидно, для задачи из $\sRP$ достаточно
+выбрать случайную строку длины $p(|u|)$,
+чтобы получить решение задачи $u$ с вероятностью $\ge\frac{1}{2}$.
+Если повторить эту процедуру
+$k$ раз, то вероятность успеха будет $1-\frac{1}{2^k}$,
+чего для практических целей вполне достаточно.
+
+\begin{theorem}
+Язык, состоящий из всех составных чисел, принадлежит $\RP$.
+\end{theorem}
+\begin{proof}
+В этом доказательстве все числа --- неотрицательны.
+Для начала вспомним несколько определений.
+
+Символ Лежандра: 
+\[
+\left( \frac{a}{p} \right) = \left\{
+\begin{array}{rcl}
+1&,& \text{уравнение $x^2 \equiv a\ (\mod\ p)$ имеет корни} \\
+-1&,&\text{в противном случае}         
+\end{array}
+\right.,
+\label{first}
+\]
+где $p$ --- простое, $a \neq 0$.
+
+Символ Якоби:
+\[
+\left( \frac{a}{N} \right) = \prod\limits_i \left( \frac{a}{p_i} \right), 
+\]
+если $N = p_1\cdots p_k$ --- разложение $N$ на простые множители
+(среди $p_i$ могут быть одинаковые). 
+Некоторые свойства:
+\begin{eqnarray*}
+\left( \frac{a}{N} \right) &=& (-1)^{\frac{N-1}{2} \frac{a-1}{2}} \left(
+\frac{N}{a} \right)\quad\mbox{(здесь $a,N\not\vdots2$, НОД$(a,N)=1$),}\\
+\left( \frac{a}{N} \right) &=&
+\left( \frac{a'}{N} \right) \quad\mbox{(при $a\equiv a'(\mod N)$)},\\
+\left( \frac{1}{p} \right) &=& 1,\\
+\left( \frac{2}{p} \right) &=& (-1)^{\frac{p^2-1}8}.
+\end{eqnarray*}
+
+\begin{exercise}
+При помощи этих свойств вычислить эффективно символ Якоби.
+\end{exercise}
+
+\begin{algorithm}\hfill\\
+Вход: число $N$.\\
+Выход: <<составное>> или <<простое>>.
+\begin{eqnarray}
+&&\text{Если $N\vdots2$ или $N=1$, выдать правильный ответ;}\\
+&&\text{$M\gets random[2..N-1]$;}\\
+&&\text{if\ $(M,N)\neq1$ \ then \ выдать ответ \ <<составное>>}\\
+&&\text{else \ if $\left( \frac{M}{N}\right) \not\equiv M^{\frac{N-1}{2}}\ (\mod \ N)$}\label{step4}\\
+&&\text{then\ выдать ответ\ <<составное>>}\\
+&&\text{else\ выдать ответ\ <<простое>> (*тут алгоритм может ошибиться*)}
+\end{eqnarray}
+\hfill$\qed$
+\end{algorithm}
+Корректность шага $(\ref{step4})$ доказывает следующая лемма:
+\begin{lemma}\label{lem:prime0}
+$N\in\mathbb{P}$, $N\neq2$ $\implies$ $M^{\frac{N-1}2}\equiv \left(\frac{M}{N}\right) (\mod N)$.
+\end{lemma}
+\begin{proof}
+\hfil
+
+\gap
+
+\end{proof}
+\begin{lemma}\label{lem:prime1}
+Пусть $N\not\vdots2$, $N\neq1$.
+Если для всех $M$, таких что $(M,N)=1$, выполняется $\left( \frac{M}{N} \right) \equiv M^{\frac{N-1}{2}}\ (\mod\ N)$, то $N$ --- простое.
+\end{lemma}
+\begin{proof}
+Будем доказывать от противного: 
+\begin{enumerate}
+\item Пусть $N$ не содержит квадратов: $N = p_1\cdots p_k$,
+$p_i\neq p_j \in \mathbb{P}$.
+Фиксируем $r$ такое, что $(\frac{r}{p_1}) = -1$
+(такое есть: пересчитаем все квадраты $\mod\ p_i$\ldots). 
+По китайской теореме об остатках можно выбрать такое $M$, что
+\begin{eqnarray*}
+M &\equiv& r\ (\mod\ p_1), \\
+M &\equiv& 1\ (\mod\ p_i)\quad \text{при $i\neq 1$}.
+\end{eqnarray*}
+С одной стороны,
+\[
+\left(\frac{M}{N}\right) = 
+\left(\frac{M}{p_1}\right)\cdot \prod\limits_{i\neq 1} 
+\left(\frac{M}{p_i}\right) = -1.
+\]
+С другой стороны,
+\[
+M^{\frac{N-1}{2}}\equiv 1\ (\mod\ p_2)\not\equiv -1(\mod\ N).
+\]
+Противоречие.
+\item Пусть $N$ содержит квадраты: $N=p^2n$, $p\in \mathbb{P}$.
+Пусть $r$ --- первообразный корень\footnote{$a$ называется
+первообразным корнем по модулю $n$, если $a^{\phi(n)}\equiv 1\ (\mod n)$
+и $\forall k\in[1\texttt{..}\phi(n)\!\!-\!\!1]$\linebreak$a^k\not\equiv 1\ (\mod n)$.
+Известно, что первообразные корни по модулю $p^2$ существуют.}
+по модулю $p^2$.
+По предположению,
+$$
+r^{N-1}\equiv(r^{(N-1)/2})^2\equiv\left(\frac{r}{N}\right)^2\equiv1\ (\mod\ N),
+$$
+а значит, и $(\mod\ p^2)$.
+Т.е., одновременно $N-1 \vdots  p(p-1)$ и $N\vdots p$, т.е., 
+два последовательных числа делятся на $p$. Противоречие.
+\end{enumerate}
+\end{proof}
+\begin{lemma}
+Если $N\notin\mathbb{P}$, то для более чем половины всех $M\in[2..N-1]$, взаимно простых
+с $N$, 
+$\left( \frac{M}{N} \right) \not\equiv M^{\frac{N-1}{2}}\ (\mod\ N)$.
+\end{lemma}
+\begin{proof}
+По лемме~\ref{lem:prime1}
+существует такое число $a$, взаимно простое с $N$, что 
+$\left( \frac{a}{N} \right) \not\equiv a^{\frac{N-1}{2}}\ (\mod\ N)$.
+Пусть $b_1,\ b_2,\ldots,\ b_k$ --- это все остатки,
+для которых выполнено сравнение
+$\left( \frac{M}{N} \right) \equiv M^{\frac{N-1}{2}}\ (\mod\ N)$. 
+
+Рассмотрим $ab_1,\ ab_2,\ldots,\ ab_k\ (\mod\ N)$. Они все различны, так как 
+если $ab_i \equiv ab_j\ (\mod\ N)$, то
+$b_i\equiv b_j\ (\mod\ N)$ (ведь $(a,N)=1$).
+Значит, их не менее $k$.
+При этом для них сравнение не выполняется: 
+%Они также отличны от $b_i$:
+$$
+\left( \frac{ab_i}{N} \right) = \left(\frac{a}{N} \right) \left(\frac{b_i}{N} \right)  = \left(\frac{a}{N} \right) \cdot b_i^{\frac{N-1}{2}}\not\equiv (ab_i)^{\frac{N-1}{2}}.
+$$
+\end{proof}
+Тем самым, вероятность ошибки нашего алгоритма не превосходит $1/2$.
+
+
+%\begin{proof}
+
+%Алгоритм, проверяющий простоту числа $N$:
+%\begin{itemize}
+%\item Если $N\vdots 2$ или $N=1$, то сразу выдать правильный ответ.
+%\item Случайно выбираем число $M$ от $2$ до $N-1$.
+%\item Если НОД$(M,N)\neq 1$, то выдать ответ <<составное>>.
+%\item (*) В противном случае,
+%      если $M^{(N-1)/2}\not\equiv (\frac{M}{N})\ (\mod N)$,
+%      то выдать ответ <<составное>>.
+%\item В противном случае, выдать ответ <<возможно, простое>>.
+%\end{itemize}
+%
+%(Здесь $(\frac{M}{N})$ --- символ Лежандра.)
+%Проверим корректность алгоритма.
+%Все шаги корректны, проверим корректность шага (*)
+%и то, что если число составное, то вероятность
+%получить ответ не позднее этого шага --- не менее $\frac{1}{2}$.
+%Доказательство этого разобьем на следующие леммы 
+%(во всех из них предполагается,
+%что $N$ --- нечетно и $\ge 3$).
+%
+%\begin{lemma}\label{lem:RP1}
+%$N\in\mathbb{P} \Rightarrow M^{(N-1)/2}\equiv (\frac{M}{N})\ (\mod N)$.
+%\end{lemma}
+%\begin{proof}
+%Доказана в курсе алгебры.
+%\end{proof}
+%
+%\begin{lemma}\label{lem:RP2}
+%Если для всех $M$,
+%взаимно простых с $N$,
+%  выполняется $M^{(N-1)/2}\equiv(\frac{M}{N})\ (\mod N)$,
+% то $N\in\mathbb{P}$.
+%\end{lemma}
+%\begin{proof}
+%Пусть $N\notin\mathbb{P}$, т.е. $N=p_1\cdot\ldots\cdot p_k$.
+%Рассмотрим 2 случая.
+%
+%1. Среди $p_i$ нет одинаковых.
+%Пусть $r$ --- невычет по модулю $p_1$,
+%т.е. $(\frac{r}{p_1})\equiv -1 (\mod p_1)$.
+%По китайской теореме об остатках существует $M$, такое, что
+%$M\equiv r (\mod p_1)$,
+%$M\equiv 1 (\mod p_i)$ при $i\neq 1$.
+%Тогда
+%$(\frac{M}{N}) = \prod\limits_i(\frac{M}{p_i}) = -1$.
+%С другой стороны,  $M^{(N-1)/2}\equiv 1 (\mod N)$.
+%Противоречие.
+%
+%2.
+%$N= p^2n$ ($p\in\mathbb{P}$).
+%Пусть $r$ --- первообразный корень по модулю $p^2$.
+%Тогда $r^{N-1} = (r^{(N-1)/2})^2 \equiv (\frac{r}{N})^2 \equiv 1 (\mod N)$.
+%Это значит, что $N-1\vdots p(p-1)$.
+%Но $N\vdots p$.
+%Противоречие.
+%\end{proof}
+%
+%\begin{lemma}\label{lem:RP3}
+%$N\notin\mathbb{P}\Rightarrow
+%|\{M\in\{2,\ldots,N-1\} \,|\, M^{(N-1)/2} \not\equiv (\frac{M}{N})\,(\mod N)\}>\frac{N-2}{2}.$
+%\end{lemma}
+%\begin{proof}
+%Пусть сравнение выполняется для остатков
+%$M_1,\ldots,M_k$ по модулю $N$.
+%По лемме~\ref{lem:RP2} существует $M^*$,
+%для которого сравнение не выполняется.
+%
+%Для остатков $M^*\cdot M_1,\ldots,M^*\cdot M_k$
+%по модулю $N$ сравнение также не выполняется
+%($(\frac{M_i M^*}{N}) = 
+%(\frac{M^*}{N})\cdot (\frac{M_i}{N}) \not\equiv
+%M_i^{(N-1)/2} (M^*)^{(N-1)/2} (\mod N)$).
+%Кроме того, они все различны:
+%$M_i M^* \equiv M_j M^* (\mod N) \Rightarrow M_i\equiv M_j(\mod N)$,   
+%поскольку НОД$(M^*,N)=1$.
+%Таким образом, их не меньше, чем тех, для которых сравнение выполняется.
+%\end{proof}
+\end{proof}
+
+\section{Нижняя оценка на время работы алгоритмов
+для задачи о принадлежности языку}
+
+\begin{definition}
+$L\in \DTime_R(f)$, если существует РАМ $A$, такая, что
+\begin{itemize}
+\item $\forall x\ A(x)=1\iff x\in L$,
+\item $\forall x\ A(x)$ работает время, не превосходящее $f(|x|)$.
+\end{itemize}
+\end{definition}
+
+\gap
+
+\begin{corollary}
+$\P\neq\EXP$.
+\end{corollary}
+
+\begin{definition}
+$L\in \PSPACE$, если существует РАМ $A$, такая, что
+\begin{itemize}
+\item $\forall x\ A(x)=1\iff x\in L$,
+\item $\forall x\ A(x)$ использует полиномиальное количество памяти
+      (то есть на каждом шаге исполнения программы суммарная длина всех
+       регистров с ненулевым значением, а также их номеров, не превосходит
+       некоторого полинома от длины битового представления $x$).
+\end{itemize}
+\end{definition}
+
+\begin{remark}
+Несложно доказать\footnote{На лекции было пояснено; в конспекте --- пробел.},
+что
+\[
+\P\subseteq\RP\subseteq\NP\subseteq\PSPACE\subseteq\EXP,
+\]
+при этом $\P\neq\EXP$, но в каком именно из включений ($\subseteq$) из этой цепочки
+имеет место неравенство, мы не знаем!
+\end{remark}
+
+\end{document}

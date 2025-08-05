@@ -1,0 +1,235 @@
+\documentclass[12pt,fleqn,a4paper]{book}
+% 
+% Packages used:
+%
+\usepackage[koi8-r]{inputenc}
+\usepackage[russian,english]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\makeatletter
+\def\@listI {\leftmargin\leftmarginii
+              \labelwidth\leftmarginii
+              \advance\labelwidth-\labelsep
+              \topsep0pt
+              \parsep0pt
+              \itemsep0pt}
+\def\@listii {\leftmargin\leftmarginii
+              \labelwidth\leftmarginii
+              \advance\labelwidth-\labelsep
+              \topsep0pt
+              \parsep0pt
+              \itemsep0pt}
+\def\@listiii{\leftmargin\leftmarginiii
+              \labelwidth\leftmarginiii
+              \advance\labelwidth-\labelsep
+              \topsep0pt
+              \parsep0pt
+              \partopsep0pt
+              \itemsep0pt}
+\def\@listiv {\leftmargin\leftmarginiv
+              \labelwidth\leftmarginiv
+              \advance\labelwidth-\labelsep}
+\def\@listv  {\leftmargin\leftmarginv
+              \labelwidth\leftmarginv
+              \advance\labelwidth-\labelsep}
+\def\@listvi {\leftmargin\leftmarginvi
+              \labelwidth\leftmarginvi
+              \advance\labelwidth-\labelsep}
+\makeatother
+\advance\textheight by 20mm
+%
+% Common customization:
+%
+\pagestyle{headings}
+\newtheorem{theorem}{Теорема}[chapter]
+\newtheorem{question}{Открытый вопрос}[chapter]
+\newtheorem{lemma}{Лемма}[chapter]
+\newtheorem{corollary}{Следствие}[chapter]
+\newtheorem{proposition}{Утверждение}[chapter]
+\newtheorem{fact}{Факт}[chapter]
+\theoremstyle{definition}
+\newtheorem{problem}{Задача}[chapter]
+\newtheorem{exercise}{Упражнение}[chapter]
+\newtheorem{example}{Пример}[chapter]
+\newtheorem{definition}{Определение}[chapter]
+\newtheorem{remark}{Замечание}[chapter]
+\newtheorem{algorithm}{Алгоритм}[chapter]
+\def\gap{\medskip\centerline{\fbox{\Huge\bfseries{ПРОБЕЛ В КОНСПЕКТЕ.}}}\medskip}
+\advance\headheight by 7pt
+\def\headsep{15mm}
+\newcommand{\lecture}[3]{%
+\def\rightmark{\fbox{\parbox{125mm}{\lecturername: \coursetitle%
+\hfil\phantom{.}}}}
+\def\leftmark{\fbox{\parbox{125mm}{Лекция {#1}. {#2}%
+\hfil\phantom{.}}}}
+\renewcommand\chaptername{Лекция}\renewcommand\thechapter{#1}\chapter{{#2}\\{\small (Конспект: {#3})}}
+\thispagestyle{headings}}
+%
+% Things to customize for the course are here:
+%
+\newcommand\lecturername{Э. А. Гирш}
+\newcommand\coursetitle{``Информатика'' (отд. математики, 1 курс)}
+%
+\newcommand{\Retc}{и\;т.\;д.}
+\newcommand{\poly}{\mathrm{poly}}
+%
+\newcommand{\ournote}[1]{\ref{?}\footnote{#1}}
+\renewcommand{\le}{\leqslant}
+\renewcommand{\ge}{\geqslant}
+\newcommand{\step}{\mathop{\longrightarrow}\limits}
+%
+\newcommand\vhdef2
+\newcommand{\hdef}[1]{{\renewcommand\vhdef2{\bfseries{#1}}\renewcommand\vhdef1}}
+\newcommand{\class}[1]{{\ifnum\vhdef=2\mathbf{#1}\else\mathrm{#1}\fi}}
+\newcommand{\lang}[1]{\mathtt{#1}}
+\newcommand{\NP}{\class{NP}}
+\newcommand{\sNP}{\class{\widetilde{NP}}}
+\newcommand{\RP}{\class{RP}}
+\newcommand{\sRP}{\class{\widetilde{RP}}}
+\renewcommand{\P}{\class{P}}
+\newcommand{\sP}{\class{\widetilde{P}}}
+\newcommand{\SAT}{\lang{SAT}}
+\renewcommand{\mod}{\mathrm{mod\ }}
+%
+% The document
+%
+\begin{document}
+\selectlanguage{russian}
+%
+% Lecture title
+%
+\lecture{16}{Вычисление дискретного преобразования Фурье и время работы алгоритма Ш\"енхаге-Штрассена}{М. Кузнецов}
+
+\section{Анализ алгоритма Ш\"енхаге-Штрассена}
+Хочется оценить время работы алгоритма.
+
+\begin{lemma}\label{lem:FFT}
+ДПФ можно вычислить за время $O(bl\log b)$.
+\end{lemma}
+Мы докажем эту лемму во второй части лекции.
+
+Итак, рекуррентное соотношение на время работы алгоритма Ш\"енхаге-Штрассена:
+\begin{multline*}
+\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!T(n)\le
+b T(2l)\mbox{ (рекурсивные вызовы)}+\\ 
+O(bl\log b)\mbox{ (время на ДПФ)}+\\ 
+\mbox{дешевые операции (сложение, битовые сдвиги)}+\\
+O((3b\log b)^{\log_23}) \mbox{ (это время работы
+<<простого>> алгоритма,}\\[-2mm]\mbox{но оно спрячется в $O(bl\log b)$)}.
+\end{multline*}
+Итого,
+\[T(n)\le bT(2l)+cbl\log b =bT(2l)+cn\log n.\]
+
+Положим
+$T'(n)=T(n)/n$.
+Тогда
+\[ T'(n)\le 2T'(4\sqrt{n})+c\log n. \]
+Докажем, что $T'(n)=O(\log n\log\log n  )$
+(т.е. $T(n)=O(n\log n\log\log n)$ --- почти линейное время).
+
+Доказываем по индукции;
+пусть для маленьких $n$ 
+выполняется $T'(n)\le c'\log n\log\log n$.
+Индукционный переход происходит от $4\sqrt{n}$ к $n$:
+\begin{multline*}
+T'(n)\le2c'(2+\log n /2)\log(2+\log n/2) + c\log n  \le\\
+	c\log n +4c'\log(2/3)+4c'\log\log n+
+	  c'\log(2/3)\log n+c'\log n\log\log n .
+\end{multline*}
+За счет увеличения $c'$ по сравнению с $c$ можно добиться, чтобы
+слагаемое $c'\log(2/3)\log n$ (отрицательное)
+стало по абсолютной величине больше,
+чем три первые (положительные) слагаемые;
+а оставшееся слагаемое --- это то, чем мы оцениваем.
+
+\section{Вычисление ДПФ}
+Научимся вычислять ДПФ (вычисление обратного преобразования
+производится аналогично --- упражнение).
+Нам нужно вычислять некоторый многочлен $p(x)$ во многих точках
+вида $w^k$, где $w$ --- степень двойки (именно, $2^{4l/b}$),
+а вычисление ведется по модулю $2^{2l}+1$.
+
+Для того, чтобы вычислить значение в точке $x_0$,
+достаточно поделить на $x-x_0$ с остатком:
+\[
+p(x)=q(x)(x-x_0)+r(x),\qquad r(x)=\mathrm{const}\mbox{ (это и есть $p(x_0)$}.
+\]
+
+Пусть $p(x)=a_0+a_1x+\ldots+a_{n-1}x^{n-1}$.
+Тогда
+\[(F(a))_i= \sum_{j=0}^{n-1} (w^i)^j a_j=p(w^i).\]
+Значит, надо рассмотреть
+$p\ \mod (x-w^i)$.
+
+Заметим, что если
+$r=p\ \mod q$ и $q'|q$, то $p \mod q'=r \mod q'$.
+Поэтому остатки $\mod x-w^i$ можно вычислять так:
+сначала вычислить остатки $\mod$ произведений таких $x-w^i$
+для разных $i$, потом остатки этих остатков $\mod$ меньших
+произведений, \Retc:
+
+\pagebreak
+\begin{verbatim}
+                          n-1    i                        
+                     p mod П( x-w )                        
+                          i=0                         
+                          /\                
+                         /  \        
+                         i                    i                
+             p mod П( x-w )        p mod П( x-w )
+(одна половина возможных i)        (другая половина)
+                    / \           / \                          
+                   /   \         /   \                                                                .....................
+                                                     i      j
+                                         p mod (( x-w )( x-w ))
+                                            (конкретные пары)
+            /\ /\  /\ /\  /\  /\  /\  /\            /\             
+                                                  i              j
+                ...                    p mod ( x-w )  p mod ( x-w )
+\end{verbatim}
+Будем разбивать не на $i\le n/2$, $i>n/2$, а аккуратно:
+так, чтобы произведения получались красивыми.
+\begin{lemma}[к лемме~\ref{lem:FFT}]
+Можно сгруппировать так,
+чтобы все произведения $\prod (x-w^i)$ в дереве имели
+вид $x^t-w^s$.
+\end{lemma}
+
+\begin{problem}
+Доказать лемму~\ref{lem:FFT}.
+
+\emph{Указание.}
+Пусть $n=2^k$. Определим $\mathrm{rev}(j)=d_{k-1}\ldots d_0$,
+где $d_0\ldots d_{k-1}$ --- битовое представление числа $j$.
+Тогда можно доказать, что
+\[
+\prod_{j=l}^{l+2^m-1}(x-w^{\mathrm{rev}(j)})= x^{2^m}-w^{\mathrm{rev}(l/2^m)}.
+\]
+(Здесь $m$ --- номер уровня в дереве.)
+\qed
+\end{problem}
+
+%w-это некая степень 2
+%?остаток от деления многочлена на x^t-w^s
+%	На предыдущем уровне делили на многочлен степени 2t
+
+Итак, какие же вычисления надо производить?
+\[
+	\sum_{i=0}^{2t-1} a_ix^i\ \mod(x^t-w^s)= 
+        \sum_{j=0}^{t-1} (a_j+w^sa_{j+t})x^j
+\]
+(первая часть, $0\le j\le t-1$, --- без изменений,
+а во второй вместо $x^t$ заменили на $w^s$).
+Все, что здесь надо делать --- сложение и умножение на степень двойки.
+
+Теперь можно доказать и лемму~\ref{lem:FFT},
+подсчитав количество операций, выполняемых в этом дереве:
+на каждом уровне дерева --- $O(b)$ операций,
+каждая из которых занимает время $O(l)$;
+количество уровней --- $\log b$.
+
+
+
+\end{document}

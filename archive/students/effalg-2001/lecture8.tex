@@ -1,0 +1,320 @@
+\documentclass[12pt,fleqn,a4paper]{book}
+% 
+% Packages used:
+%
+\usepackage[koi8-r]{inputenc}
+\usepackage[russian,english]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+%
+% Common customization:
+%
+\pagestyle{headings}
+\newtheorem{theorem}{Теорема}[chapter]
+\newtheorem{lemma}{Лемма}[chapter]
+\newtheorem{corollary}{Следствие}[chapter]
+\newtheorem{proposition}{Утверждение}[chapter]
+\newtheorem{fact}{Факт}[chapter]
+\theoremstyle{definition}
+\newtheorem{problem}{Задача}[chapter]
+\newtheorem{exercise}{Упражнение}[chapter]
+\newtheorem{example}{Пример}[chapter]
+\newtheorem{definition}{Определение}[chapter]
+\newtheorem{remark}{Замечание}[chapter]
+\newtheorem{algorithm}{Алгоритм}[chapter]
+\def\gap{\medskip\centerline{\fbox{\Huge\bfseries{ПРОБЕЛ В КОНСПЕКТЕ.}}}\medskip}
+\advance\headheight by 7pt
+\def\headsep{15mm}
+\newcommand{\lecture}[3]{%
+\def\rightmark{\fbox{\parbox{125mm}{\lecturername: \coursetitle%
+\hfil\phantom{.}}}}
+\def\leftmark{\fbox{\parbox{125mm}{Лекция {#1}. {#2}%
+\hfil\phantom{.}}}}
+\renewcommand\chaptername{Лекция}\renewcommand\thechapter{#1}\chapter{{#2}\\{\small (Конспект: {#3})}}
+\thispagestyle{headings}}
+%
+% Things to customize for the course are here:
+%
+\newcommand\lecturername{Э. А. Гирш}
+\newcommand\coursetitle{с/к ``Эффективные алгоритмы''}
+%
+% Now, this particular lecture definitions:
+%
+\newcommand{\bex}{\begin{example}\rm}
+\newcommand{\eex}{\end{example}}
+\newcommand{\ba}{\begin{algorithm}\rm}
+\newcommand{\ea}{\end{algorithm}}
+\newcommand{\bea}{\begin{eqnarray*}}
+\newcommand{\eea}{\end{eqnarray*}}
+\newcommand{\be}{\begin{eqnarray}}
+\newcommand{\ee}{\end{eqnarray}}
+\newcommand{\abs}[1]{\lvert#1\rvert}
+\renewcommand{\mod}{\mathrm{mod}}
+%
+% The document
+%
+\begin{document}
+\selectlanguage{russian}
+%
+% Lecture title
+%
+\lecture{8}{Проверка простоты числа. Рисование планарного графа.
+Параллельный алгоритм для задачи о максимальном независимом множестве.}{А. Кожевников}
+%
+% The lecture
+%
+\section{Проверка простоты числа}
+Для начала вспомним несколько определений. Для начала символ Лежандра: 
+\be
+\left( \frac{a}{p} \right) = \left\{
+\begin{array}{rcl}
+1&,& \text{уравнение $x^2 \equiv a\ (\mod\ p)$ имеет корни} \\
+-1&,&\text{в противном случае}         
+\end{array}
+\right.,
+\label{first}
+\ee
+где $p$ --- простое, $a \neq 0$.
+\begin{exercise}
+Вспомнить формулу вычисления \ref{first}.
+\end{exercise}
+Теперь символ Якоби:
+\bea
+\left( \frac{a}{N} \right) = \prod\limits_i \left( \frac{a}{p_i} \right), 
+\eea
+если $N = p_1\cdots p_k$ --- разложение $N$ на простые множители. 
+Некоторые свойства:
+\bea
+\left( \frac{a}{N} \right) &=& (-1)^{\frac{N-1}{2} \frac{a-1}{2}} \left(
+\frac{N}{a} \right),\\
+\left( \frac{1}{p} \right) &=& 1.
+\eea
+
+\begin{exercise}
+Вспомнить, как вычислять $\left( \frac{2}{p} \right) = (-1)^{?}$.
+\end{exercise}
+
+\paragraph{Формулировка алгоритма.}
+\begin{algorithm}
+Нужно проверить, простое ли число $N$.
+\be
+&&\text{$M\gets random[2..N-1]$}\\
+&&\text{if\ $(M,n)\neq1$ \ then \ answer \ ``composite''}\\
+&&\text{else \ if $\left( \frac{M}{N}\right) \not\equiv M^{\frac{N-1}{2}}\ (\mod \ N)$}\label{step4}\\
+&&\text{then\ answer\ ``composite''}\\
+&&\text{else\ answer\ ``prime'' (тут алгоритм может ошибиться)}
+\ee
+\hfill$\qed$
+\end{algorithm}
+Корректность шага $(\ref{step4})$ доказывает следующая лемма:
+\begin{lemma}\label{lem:prime1}
+Если для всех $M$, таких что $(M,N)=1$, выполняется $\left( \frac{M}{N} \right) \equiv M^{\frac{N-1}{2}}\ (\mod\ N)$, то $N$ --- простое.
+\end{lemma}
+\begin{proof}
+Будем доказывать от противного: 
+\begin{enumerate}
+\item Пусть $N$ не содержит квадратов: $N = p_1\cdots p_k$,
+$p_i\neq p_j \in \mathbb{P}$.
+Фиксируем $r$ такое, что $(\frac{r}{p_1}) = -1$
+(такое есть: пересчитаем все квадраты $\mod\ p_i$\ldots). 
+По китайской теореме об остатках можно выбрать такое $M$, что
+\bea
+M &\equiv& r\ (\mod\ p_1), \\
+M &\equiv& 1\ (\mod\ p_i)\quad \text{при $i\neq 1$}.
+\eea
+С одной стороны,
+\bea
+\left(\frac{M}{N}\right) = 
+\left(\frac{M}{p_1}\right)\cdot \prod\limits_{i\neq 1} 
+\left(\frac{M}{p_i}\right) = -1 \text{ (в том числе и $\mod\ p_2$)}. 
+\eea
+С другой стороны,
+\bea
+M^{\frac{N-1}{2}}\equiv 1\ (\mod\ p_2).
+\eea
+Противоречие.
+\item Пусть $N$ содержит квадраты: $N=p^2n$, $p\in P$.
+Пусть $r$ --- первообразный корень по модулю $p^2$.
+По предположению,
+$$
+r^{N-1}\equiv(r^{(N-1)/2})^2\equiv\left(\frac{r}{N}\right)^2\equiv1\ (\mod\ N)
+$$
+Т.е., одновременно $N-1 \vdots  p(p-1)$ и $N\vdots p$, т.е., 
+два последовательных числа делятся на $p$. Противоречие.
+\end{enumerate}
+\end{proof}
+\begin{lemma}
+Если $N\notin\mathbb{P}$, то для более чем половины всех $M$, взаимно простых
+с $N$, 
+$\left( \frac{M}{N} \right) \neq M^{\frac{N-1}{2}}\ (\mod\ N)$.
+\end{lemma}
+\begin{proof}
+По лемме~\ref{lem:prime1}
+существует такое число $a$, что 
+$\left( \frac{a}{N} \right) \not\equiv a^{\frac{N-1}{2}}\ (\mod\ N)$.
+Пусть для $b_1,\ b_2,\ldots,\ b_k$ выполнено равенство $\left( \frac{M}{N} \right) \equiv M^{\frac{N-1}{2}}\ (\mod\ N)$. 
+
+Рассмотрим $ab_1,\ ab_2,\ldots,\ ab_k\ (\mod\ N)$. Они все различны, так как 
+если $ab_i \equiv ab_j\ (\mod\ N)$, то
+$b_i\equiv b_j\ (\mod\ N)$ (ведь $(a,N)=1$). 
+Они также отличны от $b_i$:
+$$
+\left( \frac{ab_i}{N} \right) = \left(\frac{a}{N} \right) \left(\frac{b_i}{N} \right)  = \left(\frac{a}{N} \right) \cdot b_i^{\frac{N-1}{2}}\neq (ab_i)^{\frac{N-1}{2}}.
+$$
+\end{proof}
+Тем самым, вероятность ошибки нашего алгоритма не превосходит $1/2$.
+
+\section{Рисование планарного графа}
+Мы будем рассматривать двусвязные графы, то есть такие, что в них не 
+существует двух вершин, удаление которых %ребра между которыми 
+ведет к появлению двух компонент связности. 
+
+(Заметим, что если граф не таков, то его можно разбить на компоненты,
+нарисовать их по отдельность и соединить рисунки;
+чтобы отправить точку соединения на границу области, занимаемой графом,
+рисуем граф на сфере, после чего раскрываем сферу с дыркой рядом с вершиной.)
+
+\begin{definition}
+Окрестность компоненты $S$  графа $G$ это $\Gamma (S) = \{v\in V_G | \exists e \in E: 
+e = (v,s), s \in S \}$.
+\end{definition}  
+\begin{algorithm}\hfill
+\begin{enumerate}
+\item Взять какой-то цикл и нарисовать его.
+\item Если существует компонента, согласованная лишь с одной клеткой, то взять
+путь в компоненте и вставить путь в эту клетку (удалив путь из компоненты
+и разбив компоненту на несколько, если она развалилась).
+\item Если все компоненты согласованы с несколькими клетками, то взять 
+любую компоненту и вставить путь в клетку (удалив путь\ldots).
+\end{enumerate}\hfill$\qed$
+\end{algorithm}
+\begin{problem}
+Придумать незначительное изменение алгоритма,
+работающее $O(n^2)$ для любого графа, а не только 
+для планарного.
+\end{problem}
+Корректность алгоритма утверждается в следующей лемме.
+\begin{lemma}
+Пусть в какой-то моменент что-то уже нарисовано и алгоритм находится в 
+шаге 3. Компонента $C$ согласована с клетками $K_1$ и $K_2$. Если $C$ 
+можно вложить в $K_1$ (и успешно дорисовать граф до конца), 
+то ее можно вложить и в $K_2$ (и успешно дорисовать).
+\end{lemma}
+\begin{proof}
+Поменяем все компоненты, согласованные с $K_1$ и $K_2$, местами. 
+Перебором случаев проверим, что конфликтов возникнуть не должно
+(разобъем границу $K_1$ и $K_2$ на участки, принадлежащие только $K_1$,
+только $K_2$, либо им вместе; разберем случаи, когда конфликтующий путь
+начинается на одном из типов участков, а заканчивается на другом
+или том же самом).
+\end{proof}
+\begin{remark}
+Существует алгоритм, позволяющий нарисовать планарный граф 
+за линейное время отрезками прямых.
+\end{remark}
+
+\section{Параллельный алгоритм для задачи о 
+максимальном независимом множестве}
+\begin{remark}
+Пусть $f(n)$ процессоров могут за время $t(n)$ решить некоторую задачу.
+Тогда $g(n)<f(n)$ процессоров 
+могут решить ее за время $t(n)\cdot \frac{f(n)}{g(n)}$.
+Для $g(n)>f(n)$ это неверно, поэтому представляют интерес параллельные
+алгоритмы, использующие как можно больше процессоров (при той же самой
+суммарной работе $t(n)f(n)$.
+\end{remark}
+
+\begin{definition}
+\emph{Независимое множество} --- это множество вершин графа, между 
+которыми нет ребер. 
+\end{definition}
+
+Следующий параллельный алгоритм находит максимальное (\emph{по включению}) 
+независимое множество за время $O(\log^2 |\text{длина входа}|)$.
+
+\ba
+\item Пусть дан граф $G = (V,E)$, строим $S$ следующим образом: 
+\begin{enumerate}
+\item Для всех $v\in V$ таких, что $\deg(v)=0$, $S:=S \cup {v}$.
+\item Все другие вершины метим с вероятностью $\frac{1}{2\deg(v)}$.
+\item Для всех ребер $e\in E$, если оба конца помечены, то убрать пометку с 
+вершины меньшей степени. 
+\item $S:=S\cup\{$помеченные вершины$\}$.
+\item $G:=G\setminus(\{$помеченные вершины$\}\cup\{$окрестности помеченных вершин$\})$.
+\item Повторять, пока граф непуст.
+%Убрать пометки и повторить.
+\end{enumerate}
+\hfill$\qed$
+\ea
+\begin{remark}
+Алгоритм корректный, каждый его шаг занимает время не более $O(\log |E|)$
+и требует не более $|E|$ процессоров.
+\end{remark}
+\begin{definition}
+$v$ --- \emph{хорошая}, 
+если не менее $\frac{deg(v)}{3}$ ее соседей имеет степень не 
+более чем $\deg(v)$.
+\end{definition}
+\begin{lemma}
+$P\{$хотя бы одна соседка хорошей вершины $v$ помечена на шаге 2$\} 
+\ge 1-e^{ - \frac{1}{6}}$.
+\end{lemma}
+\begin{proof}
+$P\{$не так$\}=\prod\limits_{u\in F(v), \deg(u)\le \deg(v)}
+P\{ u$ --- не помечены$\} \le (1-\frac{1}{2\deg(v)})^{\deg(v)/3} \le e^{-1/6} $.
+\end{proof}
+\begin{lemma}
+Вероятность снятия пометки не превосходит $\frac{1}{2}$.
+\end{lemma}
+\begin{proof}
+Эта вероятность для вершины $v$ не превосходит 
+\begin{eqnarray*}
+&&\text{кол-во соседок $v$ не меньшей степени}\cdot 
+P\{\text{отметить такую соседку}\}\\
+&&\le \deg(v)\cdot\frac{1}{2\deg(v)}=\frac{1}{2}.
+\end{eqnarray*}
+\end{proof}
+\begin{corollary}
+Вероятность того, что хотя бы одна соседка вершины $v$ включена в $S$ 
+на шаге 4 --- не менее $\frac{1-e^{1/6}}{2}$. 
+\end{corollary}
+\begin{definition}
+Ребро $e$ хорошее, если хотя бы один из концов хороший.
+\end{definition}
+\begin{definition}
+$e(S,T)=\{$количество ребер из $S$ в $T\}$.
+\end{definition}
+\begin{lemma}
+Хороших ребер --- не менее $\frac{|E|}{2}$.
+%, то есть математическое ожидание
+%удаляемых на каждой итерации $\le \frac{1}{2}$. 
+\end{lemma}
+\begin{proof}
+Развернем ребра так, что бы они были направлены из меньшего ребра в большее;
+пусть $d_i$ и $d_o$ --- входная и выходная степени, соответственно.
+Итак, $v$ --- плохое ребро, значит $d_o(v)-d_i(v)\ge \frac{\deg(v)}{3}$ 
+(по определению хорошей вершины). Пусть $V_G$ --- множество хороших вершин,
+$V_B$ --- множество плохих вершин, $e(V_1,V_2)$ --- множество всех
+ребер из вершин множества $V_1$ в вершины множества $V_2$.
+\bea
+&2\cdot e(V_B,V_B) + e(V_B,V_G) + e(V_G,V_B) = 
+\sum\limits_{\text{$v$ --- плохая}}\deg(v)&\le \\
+\le& 3 \cdot \sum\limits_{\text{$v$ --- хорошая}}(d_o(v) - d_i(v))=3 \cdot \sum\limits_{v\ is \ good}(d_o(v) - d_i(v)) &= \\  
+= &3((e(V_B,V_G) + e(V_G,V_G)) - (e(V_G,V_B) + e(V_G,V_G))) &= \\
+= &3(e(V_B,V_G) - e(V_G,V_B)) \le 3 (e(V_B,V_G)+e(V_G,V_B)),
+\eea
+т.е.
+$$
+e(V_B,V_B)\le e(V_B,V_G)+e(V_G,V_B).
+$$
+\end{proof}
+Отсюда следует основная теорема (из которой непосредственно следует оценка
+на время работы алгоритма, ибо по ней количество итераций не превосходит
+$O(\log |E|)$):
+\begin{theorem}
+На каждой итерации исчезает в среднем $\frac{1-e^{1/G}}{4} |E|$ ребер.
+\end{theorem}
+
+\end{document}

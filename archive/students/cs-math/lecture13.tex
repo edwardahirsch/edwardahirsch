@@ -1,0 +1,313 @@
+\documentclass[12pt,fleqn,a4paper]{book}
+% 
+% Packages used:
+%
+\usepackage[koi8-r]{inputenc}
+\usepackage[russian,english]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+%
+% Common customization:
+%
+\pagestyle{headings}
+\newtheorem{theorem}{Теорема}[chapter]
+\newtheorem{question}{Открытый вопрос}[chapter]
+\newtheorem{lemma}{Лемма}[chapter]
+\newtheorem{corollary}{Следствие}[chapter]
+\newtheorem{proposition}{Утверждение}[chapter]
+\newtheorem{fact}{Факт}[chapter]
+\theoremstyle{definition}
+\newtheorem{problem}{Задача}[chapter]
+\newtheorem{exercise}{Упражнение}[chapter]
+\newtheorem{example}{Пример}[chapter]
+\newtheorem{definition}{Определение}[chapter]
+\newtheorem{remark}{Замечание}[chapter]
+\newtheorem{algorithm}{Алгоритм}[chapter]
+\def\gap{\medskip\centerline{\fbox{\Huge\bfseries{ПРОБЕЛ В КОНСПЕКТЕ.}}}\medskip}
+\advance\headheight by 7pt
+\def\headsep{15mm}
+\newcommand{\lecture}[3]{%
+\def\rightmark{\fbox{\parbox{125mm}{\lecturername: \coursetitle%
+\hfil\phantom{.}}}}
+\def\leftmark{\fbox{\parbox{125mm}{Лекция {#1}. {#2}%
+\hfil\phantom{.}}}}
+\renewcommand\chaptername{Лекция}\renewcommand\thechapter{#1}\chapter{{#2}\\{\small (Конспект: {#3})}}
+\thispagestyle{headings}}
+%
+% Things to customize for the course are here:
+%
+\newcommand\lecturername{Э. А. Гирш}
+\newcommand\coursetitle{``Информатика'' (отд. математики, 1 курс)}
+%
+\newcommand{\Retc}{и\;т.\;д.}
+\newcommand{\poly}{\mathrm{poly}}
+%
+\newcommand{\ournote}[1]{\ref{?}\footnote{#1}}
+\renewcommand{\le}{\leqslant}
+\renewcommand{\ge}{\geqslant}
+\newcommand{\step}{\mathop{\longrightarrow}\limits}
+%
+\newcommand\vhdef2
+\newcommand{\hdef}[1]{{\renewcommand\vhdef2{\bfseries{#1}}\renewcommand\vhdef1}}
+\newcommand{\class}[1]{{\ifnum\vhdef=2\mathbf{#1}\else\mathrm{#1}\fi}}
+\newcommand{\lang}[1]{\mathtt{#1}}
+\newcommand{\NP}{\class{NP}}
+\newcommand{\sNP}{\class{\widetilde{NP}}}
+\newcommand{\RP}{\class{RP}}
+\newcommand{\sRP}{\class{\widetilde{RP}}}
+\renewcommand{\P}{\class{P}}
+\newcommand{\sP}{\class{\widetilde{P}}}
+\newcommand{\SAT}{\lang{SAT}}
+\renewcommand{\mod}{\mathrm{mod\ }}
+%
+% The document
+%
+\begin{document}
+\selectlanguage{russian}
+%
+% Lecture title
+%
+\lecture{13}{Элементы теории сложности}{О. Нескоромная}
+%
+\section{Элементы теории сложности}
+
+\subsection{Классы $\P$ и $\NP$}
+Пусть $\Sigma$ --- конечный алфавит.
+Напомним, что массовая задача $M$ есть некоторое множество
+индивидуальных задач --- пар $(u,s)$ 
+(где $u,s\in\Sigma^*$,
+ $u$ --- условие,
+ $s$ --- решение).
+
+\begin{definition}
+$M \in \sNP$, если
+\begin{enumerate}
+\item $M$ --- \emph{полиномиально ограничена}, 
+т.е. 
+существует многочлен $p$, такой, что 
+для любого условия $u$, 
+если существует хотя бы одно
+такое $s$, что $(u,s)\in M$,
+то существует и $s'$ длины не более $p(|u|)$,
+такое что $(u,s')\in M$.
+\item M --- \emph{полиномиально проверяема},
+т.е. 
+существует многочлен $p$, 
+существует алгоритм $A$,
+такие, что 
+$\forall u,s\in\Sigma^* ((u,s) \in M \Leftrightarrow A(u,s)=1)$
+и при этом $A$ заканчивает свою работу за время,
+не превосходящее $p(|u|+|s|)$.
+\end{enumerate}
+\end{definition}
+
+\begin{example}
+$\{ (N,m) \;|\; N\vdots m, 1<m<N \}$.
+\end{example}
+
+\begin{example}[{$\widetilde{\SAT}$} (\emph{задача о выполнимости булевой формулы})]
+   Дана формула в конъюнктивной нормальной форме
+   (конъюнкция конечного числа дизъюнкций,
+    в каждую из дизъюнкций входят логические переменные либо их отрицания):
+   например, 
+$$\{(x_1 \lor x_2 \lor x_3)\land(\lnot x_1 \lor\lnot x_2)\land
+   (x_4 \lor\lnot x_2)\}.$$
+   Требуется найти значения переменных, такие, что 
+   значение всего выражения --- истина
+   (в приведенном примере: $x_1$ --- истина, $x_2$ --- ложь).
+   Это задача из $\sNP$: решение --- не длиннее условия,
+   и подставить мы его также можем быстро.
+   Формула, для которой такие значения существуют, называется
+   \emph{выполнимой}.
+\qed
+\end{example}
+
+\begin{definition}
+Для каждой массовой задачи $M$ определим язык 
+$L(M)=\{u \;|\; \exists s\ (u,s)\in M\}$ --- 
+множество всех условий, для которых существуют решения.
+\end{definition}
+
+\begin{definition}
+Язык $L$ принадлежит классу $\NP$,
+если $\exists M\in\sNP: L=L(M)$.
+\end{definition}
+
+\begin{definition}
+$M\in\sP$,
+если существует многочлен $p$ и существует алгоритм $A$
+(который может выдавать строку из $\Sigma^*$ или
+останавливаться с результатом <<решения нет>>), такие, что
+$A$ работает не дольше, чем $p(\mbox{размер входа})$,
+и решает задачу $M$, т.е.
+\begin{itemize}
+\item $A(u)=s \implies (u,s) \in M$;
+\item $\exists s\ (u,s) \in M \implies A(u) \neq \mbox{<<решения нет>>}$.
+\end{itemize}
+\end{definition}
+
+\begin{definition}
+$L\in\P$,
+если существует многочлен $p$ и существует алгоритм $A$
+(выдающий $0$ или $1$),
+такие, что $A$ работает не дольше, чем $p(\mbox{размер входа})$,
+и $\forall u\in\Sigma^*(A(u)=1 \Leftrightarrow u\in L)$.
+\end{definition}
+
+\begin{question}
+$\P=\!\!?\!\!\!\!=\NP$.
+\end{question}
+(Гипотеза: $\P \neq \NP$.)
+
+\subsection{Сводимости и полнота}
+<<Упростим>> этот вопрос, не изменяя его.
+
+\begin{definition}
+Язык $L$ \emph{полиномиально сводится} к языку $L'$
+(обозначим это $L\rightarrow L'$), если существует многочлен $p$ и существует алгоритм $A$,
+работающий не дольше, чем $p(\mbox{длина входа})$,
+такие, что $\forall u\!\in\!\Sigma^*\, (A(u) \in L' \Leftrightarrow u\in L)$.
+\end{definition}
+
+\begin{definition}
+Язык называется \emph{$\NP$-трудным}, 
+если любой другой язык из $\NP$ к нему сводится.
+Язык называется $\NP$-полным,
+если он $\NP$-трудный и при этом сам принадлежит $\NP$.
+\end{definition}
+
+\begin{theorem}
+Если $L$ --- $\NP$-полный и $L\in \P$, то $\P=\NP$.
+\end{theorem}
+\begin{proof}
+Очевидно.
+\end{proof}
+
+\begin{theorem}
+$\SAT$ (язык всех выполнимых формул) --- $\NP$-полный.
+\end{theorem}
+
+\begin{corollary}
+Если $\SAT\in P$, то $\P=\NP$.
+\end{corollary}
+
+\subsection{Алгоритмы, использующие случайные числа}
+\begin{definition}
+$M \in \sRP$, если
+\begin{enumerate}
+\item $M$ --- полиномиально ограничена.
+\item $M$ --- полиномиально проверяема.
+\item Каждое разрешимое условие $M$ имеет не менее половины решений,
+т.е.
+\begin{multline*}
+\forall u 
+((\exists t (u,t) \in M)
+\Rightarrow\\
+|\{s \;|\; (u,s)\in M,\; |s|\le p(|u|)\}|
+ \ge\\\frac{1}{2}\cdot\mbox{кол-во всех строк длины не более $p(|u|)$})
+\end{multline*}
+(здесь $|\ldots|$ обозначает в одном случае --- мощность множества,
+а в другом --- длину строки; многочлен $p$ --- тот, что фигурирует
+в определении полиномиальной ограниченности).
+\end{enumerate}
+\end{definition}
+
+\begin{definition}
+$L\in\RP \Leftrightarrow \exists M\in\sRP\ L=L(M)$.
+\end{definition}
+
+Очевидно, для задачи из $\sRP$ достаточно
+выбрать случайную строку длины $p(|u|)$,
+чтобы получить решение задачи $u$ с вероятностью $\ge\frac{1}{2}$.
+Если повторить эту процедуру
+$k$ раз, то вероятность успеха будет $1-\frac{1}{2^k}$,
+чего для практических целей вполне достаточно.
+
+\begin{theorem}
+Язык, состоящий из всех составных чисел, принадлежит $\RP$.
+\end{theorem}
+\begin{proof}
+
+Алгоритм, проверяющий простоту числа $N$:
+\begin{itemize}
+\item Если $N\vdots 2$ или $N=1$, то сразу выдать правильный ответ.
+\item Случайно выбираем число $M$ от $2$ до $N-1$.
+\item Если НОД$(M,N)\neq 1$, то выдать ответ <<составное>>.
+\item (*) В противном случае,
+      если $M^{(N-1)/2}\not\equiv (\frac{M}{N})\ (\mod N)$,
+      то выдать ответ <<составное>>.
+\item В противном случае, выдать ответ <<возможно, простое>>.
+\end{itemize}
+
+(Здесь $(\frac{M}{N})$ --- символ Лежандра.)
+Проверим корректность алгоритма.
+Все шаги корректны, проверим корректность шага (*)
+и то, что если число составное, то вероятность
+получить ответ не позднее этого шага --- не менее $\frac{1}{2}$.
+Доказательство этого разобьем на следующие леммы 
+(во всех из них предполагается,
+что $N$ --- нечетно и $\ge 3$).
+
+\begin{lemma}\label{lem:RP1}
+$N\in\mathbb{P} \Rightarrow M^{(N-1)/2}\equiv (\frac{M}{N})\ (\mod N)$.
+\end{lemma}
+\begin{proof}
+Доказана в курсе алгебры.
+\end{proof}
+
+\begin{lemma}\label{lem:RP2}
+Если для всех $M$,
+взаимно простых с $N$,
+  выполняется $M^{(N-1)/2}\equiv(\frac{M}{N})\ (\mod N)$,
+ то $N\in\mathbb{P}$.
+\end{lemma}
+\begin{proof}
+Пусть $N\notin\mathbb{P}$, т.е. $N=p_1\cdot\ldots\cdot p_k$.
+Рассмотрим 2 случая.
+
+1. Среди $p_i$ нет одинаковых.
+Пусть $r$ --- невычет по модулю $p_1$,
+т.е. $(\frac{r}{p_1})\equiv -1 (\mod p_1)$.
+По китайской теореме об остатках существует $M$, такое, что
+$M\equiv r (\mod p_1)$,
+$M\equiv 1 (\mod p_i)$ при $i\neq 1$.
+Тогда
+$(\frac{M}{N}) = \prod\limits_i(\frac{M}{p_i}) = -1$.
+С другой стороны,  $M^{(N-1)/2}\equiv 1 (\mod N)$.
+Противоречие.
+
+2.
+$N= p^2n$ ($p\in\mathbb{P}$).
+Пусть $r$ --- первообразный корень по модулю $p^2$.
+Тогда $r^{N-1} = (r^{(N-1)/2})^2 \equiv (\frac{r}{N})^2 \equiv 1 (\mod r)$.
+Это значит, что $N-1\vdots p(p-1)$.
+Но $N\vdots p$.
+Противоречие.
+\end{proof}
+
+\begin{lemma}\label{lem:RP3}
+$N\notin\mathbb{P}\Rightarrow
+|\{M\in\{2,\ldots,N-1\} \,|\, M^{(N-1)/2} \not\equiv (\frac{M}{N})\,(\mod N)\}>\frac{N-2}{2}.$
+\end{lemma}
+\begin{proof}
+Пусть сравнение выполняется для остатков
+$M_1,\ldots,M_k$ по модулю $N$.
+По лемме~\ref{lem:RP2} существует $M^*$,
+для которого сравнение не выполняется.
+
+Для остатков $M^*\cdot M_1,\ldots,M^*\cdot M_k$
+по модулю $N$ сравнение также не выполняется
+($(\frac{M_i M^*}{N}) = 
+(\frac{M^*}{N})\cdot (\frac{M_i}{N}) \not\equiv
+M_i^{(N-1)/2} (M^*)^{(N-1)/2} (\mod N)$).
+Кроме того, они все различны:
+$M_i M^* \equiv M_j M^* (\mod N) \Rightarrow M_i\equiv M_j(\mod N)$,   
+поскольку НОД$(M^*,N)=1$.
+Таким образом, их не меньше, чем тех, для которых сравнение выполняется.
+\end{proof}
+\end{proof}
+
+\end{document}
+

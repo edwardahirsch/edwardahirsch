@@ -1,0 +1,239 @@
+\documentclass[12pt,fleqn,a4paper]{book}
+% 
+% Packages used:
+%
+\usepackage[koi8-r]{inputenc}
+\usepackage[russian,english]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+%
+% Common customization:
+%
+\pagestyle{headings}
+\newtheorem{theorem}{Теорема}[chapter]
+\newtheorem{lemma}{Лемма}[chapter]
+\newtheorem{corollary}{Следствие}[chapter]
+\newtheorem{proposition}{Утверждение}[chapter]
+\newtheorem{fact}{Факт}[chapter]
+\theoremstyle{definition}
+\newtheorem{problem}{Задача}[chapter]
+\newtheorem{exercise}{Упражнение}[chapter]
+\newtheorem{example}{Пример}[chapter]
+\newtheorem{definition}{Определение}[chapter]
+\newtheorem{remark}{Замечание}[chapter]
+\newtheorem{algorithm}{Алгоритм}[chapter]
+\def\gap{\medskip\centerline{\fbox{\Huge\bfseries{ПРОБЕЛ В КОНСПЕКТЕ.}}}\medskip}
+\advance\headheight by 7pt
+\def\headsep{15mm}
+\newcommand{\lecture}[3]{%
+\def\rightmark{\fbox{\parbox{125mm}{\lecturername: \coursetitle%
+\hfil\phantom{.}}}}
+\def\leftmark{\fbox{\parbox{125mm}{Лекция {#1}. {#2}%
+\hfil\phantom{.}}}}
+\renewcommand\chaptername{Лекция}\renewcommand\thechapter{#1}\chapter{{#2}\\{\small (Конспект: {#3})}}
+\thispagestyle{headings}}
+%
+% Things to customize for the course are here:
+%
+\newcommand\lecturername{Э. А. Гирш}
+\newcommand\coursetitle{``Информатика'' (отд. математики, 1 курс)}
+%
+\newcommand{\Retc}{и\;т.\;д.}
+\newcommand{\poly}{\mathrm{poly}}
+%
+\newcommand{\ournote}[1]{\ref{?}\footnote{#1}}
+%
+% The document
+%
+\begin{document}
+\selectlanguage{russian}
+%
+% Lecture title
+%
+\lecture{9}{Теория формальных языков (I)}{А. Ю. Волков}
+
+Эта лекция почти целиком состоит из определений.
+
+\section{Формальные языки}
+        Будем называть \emph{алфавитом} произвольное  конечное множество (например, $\{0,1\}$ --- алфавит). Строкой в алфавите $\Sigma$ будет называться конечная последовательность его элементов (пустой строкой, обозначаемой $\epsilon$, будет называться последовательность из нуля элементов).
+
+\emph{Языком} в алфавите $\Sigma$ называется множество некоторых строк в алфавите $\Sigma$. Например: $\{\epsilon,1,00,01\}$. Или: $\{\underbrace{0\ldots0}_n\underbrace{1\ldots1}_n |n\in\mathbb{N}\}$.
+
+
+        Далее определим \emph{регулярные выражения} в алфавите $\Sigma$. 
+Они будут определяться индуктивно:
+\begin{itemize}
+\item $\emptyset$ --- регулярное выражение;
+\item $\{\epsilon\}$ --- регулярное выражение;
+\item $\{a\}$ --- регулярное выражение (для каждого $a\in\Sigma$);
+\item Если $A$, $B$ --- регулярные выражения,
+ то $A\cup B$ --- тоже регулярное выражение;
+\item Если $A$, $B$ --- регулярные выражения,
+ то $A\cdot B$ --- тоже регулярное выражение;
+\item Если $A$ --- регулярное выражение,
+ то $A^*$ --- тоже регулярное выражение.
+\end{itemize}
+Это определение исчерпывает все возможные регулярные выражения.
+
+Каждое регулярное выражение определяет некоторый язык.
+Для большинства пунктов определения очевидно, какой язык
+имеется в виду; оставшиеся пункты:
+\begin{itemize}
+\item для данных языков $A$ и $B$ язык $A\cdot B$
+      состоит из строк вида $ab$, где $a\in A$, $b\in B$
+      (значок операции ``точка'' --- конкатенации строк --- часто опускается);
+\item $A^*=\{\epsilon\}\cup A\cup A\cdot A\cup A\cdot A\cdot A\ldots$
+      (все конечные $A\cdot\ldots\cdot A$).
+\end{itemize}
+
+Например, $(\{0\}\cup\{11\})^*\cdot\{000\}$ обозначает
+множество всех последовательностей нулей и пар единиц,
+заканчивающихся на три нуля.
+
+\section{Формальные грамматики}
+        Формальной \emph{грамматикой} называется упорядоченная
+четверка $(N,\Sigma,S,R)$, где
+\begin{itemize}
+\item $N$ --- множество \emph{нетерминальных} символов
+(будут обозначаться заглавными латинскими буквами),
+\item $\Sigma$ --- множество \emph{терминальных} символов
+(будут обозначаться маленькими латинскими буквами и цифрами),
+\item $S$ --- стартовый символ ($S\in N$),
+\item $R \subseteq (N\cup\Sigma)^*N(N\cup\Sigma)^*\times (N\cup\Sigma)^*$ ---
+множество правил (вида $\alpha\to\beta$, где $\alpha,\beta$ ---
+произвольные строки терминалов и нетерминалов, но $\alpha$ содержит
+хотя бы один нетерминал).
+\end{itemize}
+
+\begin{example}\label{ex:gr1}
+$N=\{S,A\}$, $\Sigma=\{0,1\}$. 
+Правила:
+$S\to 0S1$,
+$0S\to 1A$,
+$A\to\epsilon$.
+\qed
+\end{example}
+
+Для данной грамматики введем отношение \emph{выводимости}:
+\begin{itemize}
+\item $\gamma\Rightarrow \delta$, если 
+      $\gamma=\gamma_1 \alpha \gamma_2$,
+      $\delta=\gamma_1 \beta \gamma_2$ и 
+      существует правило $\alpha\to \beta$ из $R$;
+\item $\Rightarrow^*$ --- транзитивно-рефлексивное замыкание $\Rightarrow$. 
+\end{itemize}
+\begin{example}\label{ex:gr2}
+Продолжая пример~\ref{ex:gr1}:
+$S\Rightarrow 0S1\Rightarrow 00S11\Rightarrow 01A11\Rightarrow 0111$;
+$S\Rightarrow^* 01A11$, 
+$S\Rightarrow^* 0111$,
+$S\Rightarrow^* S$.
+\qed
+\end{example}
+Строка $\alpha$, для которой $S\Rightarrow^*\alpha$, называется \emph{выводимой}
+в данной грамматике. \emph{Язык $L(G)$, порождаемый грамматикой $G$}, состоит
+из всех строк терминалов, выводимых в ней, т.е. 
+$L(G)=\{\alpha\in\Sigma^*|S\Rightarrow^*\alpha\}$.
+\begin{example}\label{ex:gr3}
+В примере~\ref{ex:gr2} указано три выводимых строки,
+но лишь одна из них (0111) попадает в язык, порождаемый
+рассматриваемой грамматикой (туда еще много строк попадает:
+он бесконечный).\qed
+\end{example}
+
+\emph{Контекстно-зависимой} (\emph{неукорачивающей}) грамматикой
+называется грамматика, для каждого правила которой
+правая часть --- не короче левой.
+
+Грамматика называется \emph{бесконтекстной} (\emph{контекстно-свободной}),
+если все ее правила имеют вид $A\to\alpha$ ($A\in N$) (т.е. у каждого правила 
+слева --- ровно один символ).
+
+Грамматика называется \emph{праволинейной}, 
+если каждое ее правило имеет вид
+$A\to\alpha$, $A\to\alpha B$ (где $\alpha\in\Sigma^*$; $A,B\in N$).
+(Замечание: не забудем, что $\epsilon\in\Sigma^*$.)
+
+Две грамматики называются \emph{эквивалентными},
+если они порождают одинаковые языки.
+
+\begin{lemma}
+Для любой праволинейной грамматики $G_1$,
+такой что $\epsilon\notin L(G_1)$,
+существует грамматика $G_2$, эквивалентная $G_1$,
+в которой имеются только правила вида
+$A\to a$ и $A\to aB$ (где $a\in\Sigma$; $A,B\in N$).
+\end{lemma}
+
+\begin{proof}
+Введем обозначение $\to^*$ для транзитивно-рефлексивного замыкания отношения $\to$.
+Пусть 
+$S(A)=\{B\neq A\;|\;B\to^*A\}$;
+$S(\epsilon)=\{A\;|\;A\to^*\epsilon\}$.
+
+Будем заменять правила $G_1$:
+\begin{itemize}
+\item
+для каждого правила 
+$A\to\gamma$, где $\gamma\notin N$,
+и для каждого $B\in S(A)$,
+добавим правило $B\to\gamma$;
+\item 
+для каждого правила 
+$A\to\gamma B$, где $\gamma\neq\epsilon$,
+и для каждого $B\in S(\epsilon)$,
+добавим правило $A\to\gamma$;
+\item
+выкинем все правила вида $A\to B$, $A\to\epsilon$ (где $A,B\in N$).
+\end{itemize}
+
+Далее, если осталось правило $A\to ab\gamma$ (где $a,b\in\Sigma$),
+заменим это правило на два правила: 
+$A\to aZ$, $Z\to b\gamma$, введя новый нетерминал $Z$.
+Так, постепенно укорачивая правила, 
+мы заменим все правила на правила вида,
+требуемого в условии леммы.
+
+Легко убедиться в том, что полученная грамматика эквивалентна исходной.
+\end{proof}
+
+\section{Конечные автоматы}\label{sec:FA}
+
+\emph{Недетерминированный конечный автомат} --- упорядоченная пятерка
+$(Q,\Sigma,q_S,F,\delta)$,
+где 
+\begin{itemize}
+\item $Q$ --- конечное множество состояний,
+\item $\Sigma$ --- алфавит,
+\item $q_S\in Q$ --- стартовое состояние, 
+\item $F\subseteq Q$ --- множество конечных состояний, 
+\item $\delta:Q\times(\Sigma\cup\{\epsilon\})\to 2^Q$ --- функция перехода.
+\end{itemize}
+
+Обозначение: будем писать $q_1\mathop{\to}\limits^a q_2$, если $q_2\in\delta(q_1,a)$
+(здесь $a\in\Sigma\cup\{\epsilon\}$).
+
+\medskip
+Недетерминированному конечному автомату дают строку в алфавите $\Sigma$;
+он, по очереди считывая ее символы,
+переходит из своего текущего состояния $q$ (начинает он с $q=q_S$)
+в одно из состояний из множества $\delta(q,a)$ (считав символ $a\in\Sigma$)
+или одно из состояний из множества $\delta(q,\epsilon)$
+(не считав ничего --- такой переход называется \emph{$\epsilon$-переходом}).
+
+Если таким образом он \underline{может}\footnote{На каждом шаге
+у него может быть несколько возможностей; нас интересует
+``наилучший вариант''.} попасть в одно из состояний из $F$
+(полностью считав данную ему строку и, быть может, сделав несколько
+$\epsilon$-переходов), то говорят, что он \emph{принимает} данную строку.
+Множество всех строк в алфавите $\Sigma$, принимаемых данным
+автоматом $\mathcal{A}$, называется \emph{языком, принимаемым этим автоматом},
+и обозначается $L(\mathcal{A})$.
+
+\bigskip
+\emph{\bfseries (Продолжение секции~\ref{sec:FA} следует\ldots)}
+           
+\end{document}
+ 

@@ -1,0 +1,169 @@
+\documentclass[12pt,fleqn,a4paper]{book}
+%
+% Packages used:
+%
+\usepackage[koi8-r]{inputenc}
+\usepackage[russian,english]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{url}
+\usepackage{fullpage}
+\advance\textheight by 15mm
+\advance\topmargin by -10mm
+\makeatletter
+\def\@listI {\leftmargin\leftmarginii
+              \labelwidth\leftmarginii
+              \advance\labelwidth-\labelsep
+              \topsep0pt
+              \parsep0pt
+              \itemsep0pt}
+\def\@listii {\leftmargin\leftmarginii
+              \labelwidth\leftmarginii
+              \advance\labelwidth-\labelsep
+              \topsep0pt
+              \parsep0pt
+              \itemsep0pt}
+\def\@listiii{\leftmargin\leftmarginiii
+              \labelwidth\leftmarginiii
+              \advance\labelwidth-\labelsep
+              \topsep0pt
+              \parsep0pt
+              \partopsep0pt
+              \itemsep0pt}
+\def\@listiv {\leftmargin\leftmarginiv
+              \labelwidth\leftmarginiv
+              \advance\labelwidth-\labelsep}
+\def\@listv  {\leftmargin\leftmarginv
+              \labelwidth\leftmarginv
+              \advance\labelwidth-\labelsep}
+\def\@listvi {\leftmargin\leftmarginvi
+              \labelwidth\leftmarginvi
+              \advance\labelwidth-\labelsep}
+\makeatother
+%
+% Common customization:
+%
+\pagestyle{headings}
+\newtheorem{theorem}{Теорема}[chapter]
+\newtheorem{lemma}{Лемма}[chapter]
+\newtheorem{proposition}{Утверждение}[chapter]
+\newtheorem{fact}{Факт}[chapter]
+\theoremstyle{definition}
+\newtheorem{problem}{Задача}[chapter]
+\newtheorem{exercise}{Упражнение}[chapter]
+\newtheorem{example}{Пример}[chapter]
+\newtheorem{definition}{Определение}[chapter]
+\newtheorem{remark}{Замечание}[chapter]
+\newtheorem{algorithm}{Алгоритм}[chapter]
+\advance\textheight by 3mm
+\newcommand{\marginnote}[1]{\marginpar{\raggedright\ \fbox{\small #1}}}
+\def\gap{\medskip\centerline{\fbox{\Huge\bfseries{ПРОБЕЛ В КОНСПЕКТЕ.}}}\medskip}
+\advance\headheight by 7pt
+\def\headsep{15mm}
+\newcommand{\lecture}[2]{%
+\def\rightmark{\fbox{\parbox{125mm}{\lecturername: \coursetitle%
+\hfil\phantom{.}}}}
+\def\leftmark{\fbox{\parbox{125mm}{Лекция {#1}. {#2}%
+\hfil\phantom{.}}}}
+\renewcommand\chaptername{Лекция}\renewcommand\thechapter{#1}\chapter{{#2}}
+\thispagestyle{headings}}
+%
+% Things to customize for the course are here:
+%
+\newcommand\lecturername{Э. А. Гирш}
+\newcommand\coursetitle{``Информатика'' (отд. информатики, 1 курс)}
+%
+% Now, this particular lecture definitions:
+%
+%
+% The document
+%
+\begin{document}
+\selectlanguage{russian}
+%
+% Lecture title
+%
+\lecture{8}{Лексикографическая сортировка}
+\section{Сортировка целых чисел}
+Заметим, что $n$ целых чисел от $1$ до $m$ отсортировать очень просто:
+организуем массив $a$ из $m$ списков и будем последовательно добавлять
+очередное число $i$ к списку $a[i]$. После этого остается только объединить
+полученные списки: $a[1]$, затем $a[2]$, и т.д. Легко видеть, что благодаря
+операции $\texttt{[$\cdot$]}$ (то есть косвенной адресации РАМ)
+мы можем обойтись всего $O(n+m)$ операциями
+над целыми числами.
+
+\section{Лексикографическая сортировка}
+\paragraph{Задача:} дано $n$ строк общей длиной $L$, 
+состоящих из чисел от $1$ до $k$.
+Требуется отсортировать их в соответствии с лексикографическим
+упорядочением: 
+$$
+s\le t \iff 
+\mbox{$s$ --- префикс $t$}
+\;\lor\;
+\exists i\, (s_i<t_i \land \forall j<i (s_j=t_j))
+$$
+(как слова в словаре).
+
+\paragraph{Алгоритм:}
+
+\begin{enumerate}
+\item Отсортируем строки по убыванию длины, получим упорядоченный список $A$.
+(Так как длина --- целое число, это можно осуществить за $O(n+l_{max})$ операций,
+где $l_{max}$ --- максимальная длина строки.)\\[+2pt]
+\item Для всех $i$, начиная с $l_{max}$ и заканчивая $1$,
+мы будем сортировать строки по символу, стоящему на очередной $i$-й позиции.
+
+\smallskip
+Для этого мы будем поддерживать массив $B$, состоящий из $k$ упорядоченных
+списков строк. На очередном шаге в $B[c]$ будут попадать строки,
+имеющие символ $c$ в позиции $i$.
+
+\smallskip
+При этом строки мы будем обрабатывать в следующей последовательности:
+сначала строки длины $i$ из $A$, затем строки из $B[1]$, $B[2]$, и т.д.
+Конечно, прежде чем начать записывать на очередном шаге в списки $B$,
+мы все упомянутые строки должны переместить (в этом порядке)
+в отдельный список $Q$ --- тем самым списки $B$ очистятся, а из $A$ будут
+удалены строки длины $i$.
+
+\smallskip
+(Ясно, что для строк, которые прежде были в одном и том же списке $B[j]$,
+и после этого шага сохраняется <<старое>> упорядочение.)
+\end{enumerate}
+
+Корректность этого алгоритма очевидна.
+Теперь будем <<дорабатывать>> его,
+чтобы ограничиться $O(L+k)$ операциями
+с символами, указателями на строки и длинами строк.
+%(значит, время работы --- $O((L+k)\log(L+k))$.
+Каждую строку мы перемещаем между списками столько раз,
+сколько в ней символов --- всего $O(L)$ перемещений; сортировка строк
+по длине займет $O(L)$ на вычисление длины и $O(L)$ на сортировку
+(эта сортировка тоже состоит просто в том, что мы отправляем
+каждую строку длины $l$ в список $A'[l]$ вспомогательного массива $A'$, 
+а потом сливаем все списки $A'[l]$
+в список $A$); организация списков и
+их окончательное объединение --- $O(k)$ операций.
+Проблема только в просматривании $k$ списков на каждом шаге:
+так может получиться порядка $kL$ операций; это много; но ведь
+списки-то зачастую --- пустые (просмотр непустых списков мы, кстати,
+уже учли в перемещении строк!).
+
+Чтобы не просматривать пустые списки, создадим заранее список пар
+$(l,s_{il})$, когда $s_{il}$ действительно существует.
+Отсортируем этот список сначала по второй компоненте,
+а потом по первой (также <<рассортировывая>> соответственно по $k$
+или $L$ упорядоченным спискам). После этого легко создать
+упорядоченные списки символов, встречающихся на позиции $l$.
+На все это уйдет $O(L+k)$ операций,
+зато даст возможность просматривать в исходном алгоритме только непустые
+списки.
+
+%[AHU, p. 84]
+
+\end{document}
+

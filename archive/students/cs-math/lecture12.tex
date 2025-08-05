@@ -1,0 +1,234 @@
+\documentclass[12pt,fleqn,a4paper]{book}
+% 
+% Packages used:
+%
+\usepackage[koi8-r]{inputenc}
+\usepackage[russian,english]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+%
+% Common customization:
+%
+\pagestyle{headings}
+\newtheorem{theorem}{Теорема}[chapter]
+\newtheorem{lemma}{Лемма}[chapter]
+\newtheorem{corollary}{Следствие}[chapter]
+\newtheorem{proposition}{Утверждение}[chapter]
+\newtheorem{fact}{Факт}[chapter]
+\theoremstyle{definition}
+\newtheorem{problem}{Задача}[chapter]
+\newtheorem{exercise}{Упражнение}[chapter]
+\newtheorem{example}{Пример}[chapter]
+\newtheorem{definition}{Определение}[chapter]
+\newtheorem{remark}{Замечание}[chapter]
+\newtheorem{algorithm}{Алгоритм}[chapter]
+\def\gap{\medskip\centerline{\fbox{\Huge\bfseries{ПРОБЕЛ В КОНСПЕКТЕ.}}}\medskip}
+\advance\headheight by 7pt
+\def\headsep{15mm}
+\newcommand{\lecture}[3]{%
+\def\rightmark{\fbox{\parbox{125mm}{\lecturername: \coursetitle%
+\hfil\phantom{.}}}}
+\def\leftmark{\fbox{\parbox{125mm}{Лекция {#1}. {#2}%
+\hfil\phantom{.}}}}
+\renewcommand\chaptername{Лекция}\renewcommand\thechapter{#1}\chapter{{#2}\\{\small (Конспект: {#3})}}
+\thispagestyle{headings}}
+%
+% Things to customize for the course are here:
+%
+\newcommand\lecturername{Э. А. Гирш}
+\newcommand\coursetitle{``Информатика'' (отд. математики, 1 курс)}
+%
+\newcommand{\Retc}{и\;т.\;д.}
+\newcommand{\poly}{\mathrm{poly}}
+%
+\newcommand{\ournote}[1]{\ref{?}\footnote{#1}}
+\renewcommand{\le}{\leqslant}
+\renewcommand{\ge}{\geqslant}
+\newcommand{\step}{\mathop{\longrightarrow}\limits}
+%
+% The document
+%
+\begin{document}
+\selectlanguage{russian}
+%
+% Lecture title
+%
+\lecture{12}{Теория~формальных~языков~(IV)}{А. Крючков}
+
+\section{Контекстно-зависимые языки}\label{sec:cs}
+
+Нас интересует, выводима ли строка $x$ в контекстно-зависимой (неукорачивающей)
+грамматике $G$.
+Будем строить дерево:
+применим каждое из правил
+к стартовому символу;
+полученные строки --- его сыновья.
+\begin{verbatim}
+     S
+  /  |  \
+ u   v   w 
+ /\  /\  /\
+............
+\end{verbatim}
+Применим каждое из правил к каждому из сыновей
+(всеми возможными способами), {\Retc}
+Так будем поступать только для строк, которые не длиннее $x$
+(остальные ветки не продолжаем); более того, если строка уже
+встречалась, соответствующую ветку (``дубликат'') продолжать не будем.
+
+Рано или поздно либо мы выведем $x$, либо все ветки оборвутся
+(строк длины $\le|x|$ --- конечное число, а вывод в неукорачивающей
+грамматике обязательно использует только такие строки).
+
+
+\section{Рекурсивно-перечислимые языки}
+
+Машина Тьюринга (детерминированная):              
+\begin{multline*}
+(Q,\Sigma,>,\_,q_s,q_y,q_n,\\
+\delta:Q\times (\Sigma \cup \{>,\_\})
+\rightarrow
+Q\times(\Sigma \cup \{>,\_\})\times\{-1,0,1\},
+\end{multline*}
+где
+\begin{itemize}
+\item[$>$] --- символ начала строки,
+\item[$\_$] --- пустой символ,
+\item[$q_s\in Q$] --- начальное состояние,
+\item[$q_y, q_n\in Q$] --- конечные состояния
+(принимающее и отвергающее),
+\item[$\Sigma$] --- алфавит,
+\item[$Q$] --- конечное множество состояний,
+\item[$\delta$] --- функция перехода.
+\end{itemize}
+
+\begin{verbatim}
+________________________
+  |  |  |  |  |  |  |
+> |a |b |a |c |_ |_ |...
+__|__|__|__|__|__|__|___
+  <-- ^ -->
+       \
+        \
+       головка
+\end{verbatim}
+
+На каждом шаге мы меняем символ, на который указывает головка,
+в соответствии с функцией $\delta$,
+а затем сдвигаем головку на $-1$, $0$ или $1$ позицию вправо.
+
+\begin{definition}
+$q\step^{a/b,+} p \Leftrightarrow (p,b,+1)=\delta(q,a)$
+(заменяем a на b и идем вправо).
+Аналогично с $-1$ и $0$.
+\end{definition}
+
+Попав в конечное состояние, машина обязательно останавливается.
+Если на входе $x$ мы попадаем в  $q_y$, обозначим это $M(x)=1$;
+если в $q_n$, то $M(x)=0$;
+никуда (работаем бесконечно долго) --- $M(x)=+\infty$.
+
+\begin{theorem}\label{th:TMvsRAM}
+По любой машине Тьюринга $M$ можно построить RAM-машину $M'$,
+такую, что $\forall x\ M(x)=M'(x)$, а время работы машины $M'$
+ограничено полиномом от времени работы $M$ (коэффициенты этого полином зависят
+только от $M$, но не от входа).
+И наоборот.
+\end{theorem}
+\begin{problem}
+Доказать теорему~\ref{th:TMvsRAM}.
+\end{problem}
+
+\begin{theorem}
+Пусть $L\subseteq \Sigma^*$.
+Тогда существует грамматика (с произвольными правилами) $G$,
+порождающая $L$,
+тогда и только тогда,
+когда существует ДМТ $M$, такая, что для любого $x\in L$ выполняется
+$M(x)=1$, а для любого $x\notin L$ выполняется $M(x)\neq 1$.
+\end{theorem}
+\begin{proof}
+
+\fbox{$\Rightarrow$}
+Ведем себя аналогично тому, как решали задачу принадлежности в
+разделе~\ref{sec:cs}, только не обрываем никаких ветвей
+(которые можно продолжить).
+Найдем строку --- хорошо ($M(x)=1$);
+нет --- не заканчиваем работу ($M(x)=+\infty$).
+
+\fbox{$\Leftarrow$}
+Строим грамматику.
+Подготовим начальную конфигурацию машины Тьюринга:\\
+$S\step S' Z$;\\
+$Z\step \_ Z$;\\
+$Z\step E'$;\\
+$S'\step aS'a$ ($\forall a \in\Sigma$);\\
+$S'\step E$$>$$q_s$.
+
+Так мы выведем строку
+``перевернутый вход $E$ $>$ $q_s$ вход $\_\ldots\_$ $E'$''.
+
+Также нетерминалами будут состояния машины Тьюринга.
+Моделируем работу машины Тьюринга следующим образом:\\
+$aq\step bp$, если $q\step^{a/b,0}p$;\\
+$aq\step pb$, если $q\step^{a/b,-}p$;\\
+$aq\step q'$ и $q'c\step cp$, если $q\step^{a/b,+}p$;
+
+Остается в конце работы убрать оставшееся на ленте
+(а вместе с символами $E$ и $E'$ --- и состояние $q_y$):\\
+$q_y c\step q_y$ $(\forall c\in\Sigma\cup\{\_,>\})$;\\
+$c q_y\step q_y$ $(\forall c\in\Sigma\cup\{\_,>\})$;\\
+$E q_y E'\step \epsilon$.
+\end{proof}
+
+\begin{definition}
+Язык $L\subseteq\Sigma^*$ --- \emph{рекурсивно-перечислимый},
+если существует машина Тьюринга $M$,
+такая, что $\forall x\in\Sigma^*\ (x \in L \Leftrightarrow M(x)=1)$.
+\end{definition}
+
+\begin{definition}
+Язык $L\subseteq\Sigma^*$ --- \emph{рекурсивный},
+если существует машина Тьюринга $M$,
+такая, что $\forall x\in\Sigma^*\ ((x \in L \Leftrightarrow M(x)=1) \land
+(x\notin L \Leftrightarrow M(x)=0))$.
+\end{definition}
+Заметим, что рекурсивные языки --- в точности те,
+для которых проблема принадлежности разрешима.
+\begin{theorem}
+Существует язык, являющийся рекурсивно-перечислимым, но не рекурсивным.
+\end{theorem}
+\begin{lemma}\label{lem:univMT}
+Существует \emph{универсальная машина Tьюринга} $U$:
+на вход $U$ подается описание машины $T$ и вход,
+а выдает она то, что выдала бы машина $T$ на данном входе.
+\end{lemma}
+\begin{problem}
+Доказать лемму~\ref{lem:univMT}.
+\end{problem}
+\begin{proof}[Доказательство теоремы.]
+Определим язык $L$ так:
+$(M,x)\in L \Leftrightarrow M(x)=1$.
+Он, очевидно, рекурсивно-перечислимый.
+Покажем, что он не рекурсивный.
+
+Пусть он все же рекурсивный.
+Тогда существует машина $A$, такая, что\\
+$A((M,x))=1 \Leftrightarrow M(x)=1$,\\
+$A((M,x))=0 \Leftrightarrow M(x)\neq 1$.
+
+Построим еще одну машину, $D$, на вход которой подается описание машины $R$:\\
+$D(R)=0$, если $A((R,R))=1$;\\
+$D(R)=1$, если $A((R,R))=0$\\
+(чтобы построить ее, воспользуемся леммой~\ref{lem:univMT}:
+применим $U$ к $A$ с входом $(R,R)$).
+
+Чему равно $D(D)$?
+Если $D(D)=1$, то $A((D,D))=0$, т.е. $D(D)\neq 1$ (противоречие).
+Если же $D(D)=0$, то $A((D,D))=1$, т.е. $D(D)=1$ (противоречие).
+По построению не может быть и $D(D)=+\infty$,
+т.е. машины $D$ (а вместе с ней --- и машины $A$) не существует.
+\end{proof} 
+\end{document}

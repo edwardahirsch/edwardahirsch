@@ -1,0 +1,221 @@
+\documentclass[12pt,fleqn,a4paper]{book}
+%
+% Packages used:
+%
+\usepackage[koi8-r]{inputenc}
+\usepackage[russian,english]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{url}
+\usepackage{fullpage}
+\advance\textwidth by 3mm
+\makeatletter
+\def\@listI {\leftmargin\leftmarginii
+              \labelwidth\leftmarginii
+              \advance\labelwidth-\labelsep
+              \topsep0pt
+              \parsep0pt
+              \itemsep0pt}
+\def\@listii {\leftmargin\leftmarginii
+              \labelwidth\leftmarginii
+              \advance\labelwidth-\labelsep
+              \topsep0pt
+              \parsep0pt
+              \itemsep0pt}
+\def\@listiii{\leftmargin\leftmarginiii
+              \labelwidth\leftmarginiii
+              \advance\labelwidth-\labelsep
+              \topsep0pt
+              \parsep0pt
+              \partopsep0pt
+              \itemsep0pt}
+\def\@listiv {\leftmargin\leftmarginiv
+              \labelwidth\leftmarginiv
+              \advance\labelwidth-\labelsep}
+\def\@listv  {\leftmargin\leftmarginv
+              \labelwidth\leftmarginv
+              \advance\labelwidth-\labelsep}
+\def\@listvi {\leftmargin\leftmarginvi
+              \labelwidth\leftmarginvi
+              \advance\labelwidth-\labelsep}
+\makeatother
+%
+% Common customization:
+%
+\pagestyle{headings}
+\newtheorem{theorem}{Теорема}[chapter]
+\newtheorem{lemma}{Лемма}[chapter]
+\newtheorem{proposition}{Утверждение}[chapter]
+\newtheorem{fact}{Факт}[chapter]
+\theoremstyle{definition}
+\newtheorem{problem}{Задача}[chapter]
+\newtheorem{exercise}{Упражнение}[chapter]
+\newtheorem{example}{Пример}[chapter]
+\newtheorem{definition}{Определение}[chapter]
+\newtheorem{remark}{Замечание}[chapter]
+\newtheorem{algorithm}{Алгоритм}[chapter]
+\newcommand{\marginnote}[1]{} %{\marginpar{\raggedright\ \fbox{\small #1}}}
+\def\gap{\medskip\centerline{\fbox{\Huge\bfseries{ПРОБЕЛ В КОНСПЕКТЕ.}}}\medskip}
+\advance\headheight by 7pt
+\def\headsep{15mm}
+\newcommand{\lecture}[2]{%
+\def\rightmark{\fbox{\parbox{125mm}{\lecturername: \coursetitle%
+\hfil\phantom{.}}}}
+\def\leftmark{\fbox{\parbox{125mm}{Лекция {#1}. {#2}%
+\hfil\phantom{.}}}}
+\renewcommand\chaptername{\underline{План} лекции}\renewcommand\thechapter{#1}\chapter{{#2}}
+\thispagestyle{headings}}
+%
+% Things to customize for the course are here:
+%
+\newcommand\lecturername{Э. А. Гирш}
+\newcommand\coursetitle{``Информатика'' (отд. информатики, 1 курс)}
+%
+% Now, this particular lecture definitions:
+%
+%
+% The document
+%
+\begin{document}
+\selectlanguage{russian}
+%
+% Lecture title
+%
+\lecture{2}{Представление данных}
+\section{Представление данных}
+
+\begin{description}
+\item[Переменная] в компьютере действительно меняет значение.
+На самом деле, переменная --- это место в памяти, в котором
+хранится текущее значение этой переменной.
+В языках программирования ряд языковых конструкций подразумевает
+\emph{<<разыменование>>}: например,
+если переменная упоминается
+в правой части присваивания, вместо нее подставляется ее значение
+(это и есть <<разыменование>>: написано имя переменной, а оказалось --- значение),
+а вот если переменная стоит слева
+от оператора присваивания $:=$ (и кроме нее там больше ничего нет),
+то она действительно обозначает место в памяти, куда будет записан
+результат вычисления правой части.
+
+\item[Подпрограммы] (процедуры, функции).
+Это куски программы, которые можно вызвать (передать управление
+на их начало); по окончании работы они возвращают управление
+на следующий оператор, идущий за оператором вызова.
+При вызове можно передать параметры, в ответ подпрограмма может
+вернуть значение.
+
+\item[Область действия] переменной --- подпрограмма (главная программа).
+Одноименные переменные
+при каждом вызове подпрограммы --- это \emph{разные} переменные
+(так же, как и параметры).
+\end{description}
+
+\section{Структуры данных}
+Абстрактная структура данных полностью описывается
+\emph{набором операций}, которые могут быть к ней применены
+(например, <<найти все данные>>).
+В наиболее простом случае структура данных состоит
+из элементов некоторого базового типа\footnote{В более сложных
+случаях могут быть элементы разных базовых типов.}
+(при реализации может потребоваться, чтобы к элементам
+этого типа были применимы определенные операции:
+например, <<выяснить, какой из двух элементов больше>>).
+
+Абстрактная структура данных может быть реализована по-разному.
+При разных реализациях время работы операций может быть различным.
+
+\subsection{Массив}
+
+(Одномерный) \emph{массив} --- это абстрактная структура данных,
+к которой применима операция \texttt{[$\cdot$]}.
+Эта операция для массива $a$ и целого числа $i$
+выдает местонахождение элемента номер $i$ из массива $a$.
+\emph{Иначе говоря, выражение $a[i]$ может быть использовано как переменная:
+если оно находится слева от присваивания, в него может быть записано значение;
+если оно находится справа от присваивания, вместо него подставляется значение
+упомянутого элемента.}
+
+\paragraph{Реализация:} на РАМ можно отвести под массив
+несколько последовательных регистров;
+операция \texttt{[$\cdot$]} реализуется при помощи косвенной адресации
+(например, если индексы нумеруются с нуля,
+$[i]$ обращается к регистру номер $i_0+i$, где $i_0$ --- номер первого
+из отведенных под массив регистров).
+
+В большинстве языков программирования имеется встроенная реализация массива.
+
+\subsection{Файл}
+
+\emph{Файл последовательного доступа} --- это абстрактная структура данных,
+к которой применимы операции
+\begin{itemize}
+\item READ (с переходом к следующей записи),
+\item WRITE (с переходом к следующей записи) и 
+\item REWIND.
+\end{itemize}
+Его также можно рассматривать как ленту, по которой движется
+читающая/пишущая головка: каждый раз после чтения или записи она передвигается
+на одну позицию в направлении конца файла; по команде
+REWIND она возвращается к самому началу.
+
+\subsection{Очередь}
+
+Очередь (FIFO\footnote{First In, First Out}) --- это абстрактная структура данных,
+к которой применимы операции
+\begin{itemize}
+\item ENQUEUE, позволяющая добавить элемент в конец очереди;
+\item DEQUEUE, позволяющая удалить элемент из начала очереди;
+\item HEAD, позволяющая посмотреть элемент из начала очереди.
+\end{itemize}
+
+\paragraph{Реализация: } можно реализовать как массив со счетчиком,
+который действует по модулю числа элементов в массиве, но
+тогда размер очереди будет ограничен. Можно также реализовать как список
+(что такое список --- см. ниже).
+
+\subsection{Очередь с приоритетами}
+
+\gap
+
+\subsection{Стек}
+
+Стек (LIFO\footnote{Last In, First Out}) --- это абстрактная структура данных,
+к которой применимы операции
+\begin{itemize}
+\item PUSH, позволяющая положить элемент на верхушку стека;
+\item POP, позволяющая снять (удалить) элемент с верхушки стека и выдать его значение.
+\end{itemize}
+Часто реализация стека допускает и применение операции \texttt{[$\cdot$]}
+(как у массива). Заметим, что операция <<посмотреть элемент из верхушки стека>>
+реализуется тривиально (POP, а затем PUSH).
+
+\paragraph{Реализация: } можно реализовать как массив со счетчиком.
+В частности, это очень легко сделать на РАМ (см. реализацию массива выше).
+
+\subsection{(Однонаправленный) список}
+
+\gap
+
+\paragraph{Реализация: }\hfill
+
+\gap
+
+\subsection{Двунаправленный список}
+
+\gap
+
+\paragraph{Реализация: }\hfill
+
+\gap
+
+\subsection{Словарь}
+
+\gap
+
+О реализации словарей мы подробно поговорим несколькими лекциями позже.
+
+\end{document}
+

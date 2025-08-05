@@ -1,0 +1,372 @@
+\documentclass[12pt,fleqn,a4paper]{book}
+% 
+% Packages used:
+%
+\usepackage[koi8-r]{inputenc}
+\usepackage[russian,english]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+%
+% Common customization:
+%
+\pagestyle{headings}
+\newtheorem{theorem}{Теорема}[chapter]
+\newtheorem{lemma}{Лемма}[chapter]
+\newtheorem{proposition}{Утверждение}[chapter]
+\newtheorem{fact}{Факт}[chapter]
+\theoremstyle{definition}
+\newtheorem{problem}{Задача}[chapter]
+\newtheorem{exercise}{Упражнение}[chapter]
+\newtheorem{example}{Пример}[chapter]
+\newtheorem{definition}{Определение}[chapter]
+\newtheorem{remark}{Замечание}[chapter]
+\newtheorem{algorithm}{Алгоритм}[chapter]
+\def\gap{\medskip\centerline{\fbox{\Huge\bfseries{ПРОБЕЛ В КОНСПЕКТЕ.}}}\medskip}
+\advance\headheight by 7pt
+\def\headsep{15mm}
+\newcommand{\lecture}[3]{%
+\def\rightmark{\fbox{\parbox{125mm}{\lecturername: \coursetitle%
+\hfil\phantom{.}}}}
+\def\leftmark{\fbox{\parbox{125mm}{Лекция {#1}. {#2}%
+\hfil\phantom{.}}}}
+\renewcommand\chaptername{Лекция}\renewcommand\thechapter{#1}\chapter{{#2}\\{\small (Конспект: {#3})}}
+\thispagestyle{headings}}
+%
+% Things to customize for the course are here:
+%
+\newcommand\lecturername{Э. А. Гирш}
+\newcommand\coursetitle{с/к ``Эффективные алгоритмы''}
+%
+% Now, this particular lecture definitions:
+%
+\newcommand{\bex}{\begin{example}\rm}
+\newcommand{\eex}{\end{example}}
+\newcommand{\ba}{\begin{algorithm}\rm}
+\newcommand{\ea}{\end{algorithm}}
+\newcommand{\bea}{\begin{eqnarray*}}
+\newcommand{\eea}{\end{eqnarray*}}
+\newcommand{\be}{\begin{eqnarray}}
+\newcommand{\ee}{\end{eqnarray}}
+\newcommand{\abs}[1]{\lvert#1\rvert}
+%
+% The document
+%
+\begin{document}
+\selectlanguage{russian}
+%
+% Lecture title
+%
+\lecture{7}{Линейное программирование.}{Ф. Александров}
+%
+% The lecture
+%
+\section{Метод внутренней точки}
+Предъявим способ решения общей задачи линейного программирования.
+\begin{eqnarray}\label{eq:0}
+%\begin{aligned}
+&& \min<c,x>,\\
+&& Ax=b.\nonumber
+%\end{aligned}
+\end{eqnarray}
+
+\paragraph{Постановка задачи.}
+Будем решать задачу вида
+\begin{eqnarray}
+%\begin{aligned}
+ && \min<c,x>=\!\!?\!\!\!\!=0, \nonumber\\
+ && \Omega:  
+\begin{cases} 
+  \quad Ax={\bf0},\\
+  \quad \sum_ix_i=1,\\
+  \quad x_i\geq0 
+\end{cases}\label{eq:1}
+%\end{aligned}
+\end{eqnarray}
+причем известно, что $<c,x>\,\geqslant0$ на $\Omega$,
+и дана внутренняя точка $a\in\Omega$.
+Иначе говоря, надо выяснить, достигает ли $<c,x>$ нуля на $\Omega$,
+являющемся пересечением подпространства $\{x|Ax={\bf0}\}$ с
+\emph{симплексом} $\{x|\sum_ix_i=1,\;x_i\geq0\}$. 
+Очевидно, что можно рассматривать только случай, когда $c \in \Omega$. 
+\begin{problem}
+Доказать, что задачи \ref{eq:0} и \ref{eq:1} эквивалентны.\\
+\emph{Указание.} Ознакомившись с этой лекцией, проделать 
+необходимые проективные преобразования для того, чтобы загнать все
+внутрь симплекса и сделать уравнение $Ax=\ldots$ однородным.
+Добиться поиска конкретного минимума (именно, нуля) можно, 
+комбинируя задачу \ref{eq:0} с двойственной.
+\end{problem}
+
+
+\paragraph{Схема алгоритма.}
+\begin{algorithm}[{\rm Схема\bf}] \label{alg:0}
+Алгоритм итеративный, при каждом шаге от точки $a$ переходим к 
+$\phi(a)$, и так до тех, пока не подберемся достаточно близко к решению.
+
+Возьмём исходную для алгоритма точку $a$. Если $<c,a>=0$, то 
+останавливаемся, искомая точка найдена. Иначе переходим к $\phi(a)$.
+Проверяем значение $<c,\phi(a)>$, потом
+$\phi^2(a)$,$\phi^3(a)$,$\ldots$ Так постепенно ``подбираемся'' к
+решению. Количество переходов может быть большим, поэтому условия 
+остановки будут приведены позднее.
+
+Подобравшись ``достаточно близко'' к решению, отправимся,
+не увеличивая $<c,\cdot>$, к ближайшей
+вершине. В ней-то и будет решение.\hfill$\qed$
+\end{algorithm}
+
+\paragraph{Условия остановки.}
+Очевидно, что решение задачи \ref{eq:1}, если оно существует, то 
+находится в вершине области $\Omega$. 
+
+\begin{lemma}\label{lemma:0}
+  Пусть $a_*$, $b_*$ --- вершины области $\Omega$. Тогда
+  \bea 
+  \abs{<c,a_*>-<c,b_*>} > 2^{-kL},
+  \eea
+  где $L$ --- общая длина входа алгоритма, $k$ --- вещественная константа.
+\end{lemma}
+
+\begin{problem}
+Доказать лемму \ref{lemma:0}.
+\end{problem}
+
+На основании этой леммы получаем признак того, что ``подобрались''
+достаточно близко к решению. Если значение целевой функции $<c,\cdot>$
+в точке $a'$, полученной на данном шаге алгоритма, удовлетворяет 
+неравенству 
+$$
+<c,a'>\,\leqslant2^{-kL},
+$$
+то ``доехав'' от $a'$ до ближайшей вершины (не увеличивая 
+при этом \mbox{$<c,\cdot>$}), получим решение (опять же, если оно 
+существует).  
+
+Пусть
+$$
+f(x)=\sum_i\ln\left(\frac{<c,x>}{x_i}\right).
+$$
+
+На каждом шаге алгоритма будем вычислять $f(a)$. 
+Значение этой фунции должно на каждом шаге 
+убывать на некоторую константу. Если на каком-то шаге 
+убывает слабее, то это означает, что задача решения не имеет, 
+завершаем алгоритм.
+
+\paragraph{Функция перехода.}
+Теперь предъявим функцию перехода $\phi$. 
+Есть $a=(a_1,...,a_n)^{T}$ --- внутренняя точка области $\Omega$,
+построим значение $\phi$ в этой точке. Рассмотрим матрицу 
+$$ D_a=\begin{pmatrix} 
+  a_1 & 0 & \hdotsfor{2} & 0 \\
+  0   & a_2 & 0 & \dots & 0 \\
+  \hdotsfor{5} \\
+  0 & \hdotsfor{1} & 0 & a_{n-1} & 0 \\
+  0   & \hdotsfor{2} & 0 & a_n
+  \end{pmatrix} $$
+
+Преобразование 
+$$ T(x)=\frac{D_a^{-1}x}{<e,D_a^{-1}x>}, \quad e=(1,1,\ldots,1) $$
+переводит внутреннюю точку во внутреннюю, а вершину симплекса --- в вершину;
+$$ T(a)=a_0=(1/n,\ldots,1/n). $$
+В преобразованных координатах наше подпространство имеет вид
+{\linebreak}$\{x'|ADx'={\bf0}\}$, а целевая функция --- $<c',\cdot>$,
+где $c'=Dc$.
+Наконец, функция $f$ выглядит так:
+$$
+f'(x')=\sum_i\ln(\frac{<c',x'>}{x'_i})-\sum_i\ln a_i.
+$$
+
+Далее, в симплекс вписываем шар $B(a_0,r)$ и рассмотрим шар 
+$B(a_0,\alpha r)$, где  $\alpha \in (0,1)$ --- параметр алгоритма.
+\emph{Пересечение $B'=B(a_0,\alpha r)\cap\{x'|ADx'=0\}$ 
+этого шара с подпространством дает содержащийся в множестве,
+по которому мы оптимизируем, шар меньшей размерности
+и того же радиуса, ибо наше подпространство содержит его центр:
+$ADa_0 = \frac{1}{n}Aa = 0$.}
+В шаре оптимизировать очень просто:
+из точки $a_0$ сдвинемся на радиус этого шара 
+в направлении вектора $(-c')$, получив точку $a''$.
+
+Обратное к $T(x)$ преобразование выглядит так:
+$$
+T^{-1}(x)=\frac{Dx}{<e,Dx>}.
+$$
+Применив его к точке $a''$ (полученной только что сдвигом из $a_0$), 
+найдём новую точку, которая и будет искомым $\phi(a)$. Всё,
+построение отображения $\phi$ закончили. 
+
+\paragraph{Доказательства.}
+Наша цель --- показать, что задача имеет решение тогда и только тогда,
+когда на каждом шаге значение функции $f'$
+будет убывать не менее, чем на некоторую константу.
+Тем самым мы ограничим количество шагов нашего алгоритма
+и получим оценку на время его работы.
+Начнем с того, что покажем, что наш шар меньшей размерности
+действительно содержит точку, в которой
+$f'$ значительно меньше, чем в $a_0$.
+
+\begin{lemma}\label{lemma:1}
+Если задача (\ref{eq:1}) имеет решение, то
+$\exists b' \in B': \quad f'(b') \leq f'(a_0)-\delta$,
+где $\delta:=\ln(1+\alpha)=\mathrm{const}$.
+
+\begin{proof}
+Пусть $x^*$ --- точка $T(\Omega)$, в которой 
+достигается{\linebreak}$\min<c',x>=0$. 
+%$$<c,x^*>=0 \quad \Leftrightarrow \quad <Dc,x^*>=0$$
+Предъявим $b'$: проведём отрезок, соединяющий $a_0$ и $x^*$.
+Пересечение этого отрезка и границы шара $B'$ % проекция $B(a_0,\alpha r)$
+обозначим за $b'$.
+
+%Пусть $c' := Dc$, 
+Тогда
+$
+\exists \lambda \in (0,1): \quad
+<c',b'>=(1-\lambda)<c',a_0>+\lambda <c',x^*>
+$.
+Но $<c',x^*>=0$, а значит,
+$$
+\frac{<c',a_0>}{<c',b'>}=\frac{1}{1-\lambda},
+$$
+\begin{eqnarray*}
+&&
+f'(a_0)-f'(b')=
+\sum_i \ln \frac{<c',a_0>}{{a_0}_i} - \sum_i \ln \frac{<c',b'>}{b'_i}=
+\\&&
+\sum_i \ln \left(\frac{<c',a_0>}{<c',b'>}\frac{b'_i}{{a_0}_i}\right)=
+\sum_i \ln \left(
+\frac{1}{1-\lambda}\frac{(1-\lambda) {a_0}_i+\lambda
+  x^*_i}{{a_0}_i}\right)=
+\\&&
+\sum_i \ln
+\left(1+\frac{\lambda}{1-\lambda}\frac{x^*_i}{{a_0}_i}\right)\geq
+\ln\left(
+1+\frac{\lambda}{1-\lambda}\sum_{i \in [1..n]}\frac{x^*_i}{{a_0}_i}\right)=
+\ln\left(1+\frac{\lambda n}{1-\lambda}\right).
+\end{eqnarray*}
+Далее, так как
+$b'=(1-\lambda)a_0+\lambda x^*$, имеем
+$$
+\lambda = 
+\frac{\text{длина отрезка $a_0b'$}}{\text{длина отрезка $a_0x^*$}}=
+\frac{\alpha r}{\text{длина отрезка $a_0x^*$}}
+\geq \frac{\alpha r}{R},
+$$ 
+где $R$ --- радиус шара,
+описанного  вокруг симплекса.
+
+\begin{fact}\label{fact:0}
+Пусть  $r$ --- радиус вписанного в симплекс шара в $\mathbb{R}^n$,\linebreak 
+$R$ --- радиус описанного вокруг симплекса шара. Тогда 
+$$\frac{r}{R}=\frac{1}{n-1}.$$
+\end{fact}
+
+Воспользовавшись фактом \ref{fact:0}, получаем
+$$\lambda \geq \frac{\alpha}{n-1}.$$
+Тогда 
+$$f'(a_0)-f'(b')\geq \ln \left(
+1+\frac{\frac{\alpha n}{n-1}}{1-\frac{\alpha}{n-1}}\right)=
+\ln\left(1+\frac{\alpha n}{n-1-\alpha}\right) 
+\overset{n \rightarrow \infty}{\searrow} \ln (1+\alpha).$$
+
+Возьмём $\delta := \ln(1+\alpha)$.
+\end{proof}
+\end{lemma}
+
+Показав, что точка с маленьким значением $f'$ действительно имеется,
+покажем, что в точке, к которой переходит наш алгоритм, значение
+тоже не слишком велико.
+
+\begin{lemma}\label{lemma:2}
+Пусть $b'$ --- точка, минимизирующая целевую функцию{\linebreak}$<c',\cdot>$ 
+на $B'$. 
+Тогда $f'(b')\leq f'(a_0)-\delta'$, где $\delta'=\mathrm{const}$.
+\begin{proof}
+Обозначим точку $b'$, полученную в лемме \ref{lemma:1},
+как $b_{\ref{lemma:1}}$.
+$$f'(a_0)-f'(b')=f'(a_0)-f'(b_{\ref{lemma:1}})+f'(b_{\ref{lemma:1}})-f'(b')
+\overset{\text{лемма } \ref{lemma:1}}{\geq}\delta +
+f'(b_{\ref{lemma:1}})-f'(b')$$
+Пусть 
+$$\widetilde{f}(x)=n\ln\frac{<c',x>}{<c',a_0>}.$$
+Тогда
+\begin{eqnarray}\label{eq:2}
+%\begin{aligned}
+f'(a_0)-f'(b') &\geq&\\
+&&\widetilde{f}(b_{\ref{lemma:1}})-\widetilde{f}(b')+\nonumber\\
+&&\left(f'(b_{\ref{lemma:1}})-\left(f'(a_0)+\widetilde{f}(b_{\ref{lemma:1}})\right)\right)-\nonumber\\
+&&\left(f'(b')-\left(f'(a_0)+\widetilde{f}(b')\right)\right),\nonumber
+%\end{aligned}
+\end{eqnarray}
+
+причем
+\begin{eqnarray}%\label{eq:3}
+%\begin{aligned}
+&&f'(x)-\left(f'(a_0)+\widetilde{f}(x)\right)=\nonumber\\
+&&\sum_i\ln\frac{<c',x>}{x_i}-\sum_i\ln\frac{<c',a_0>}{{a_0}_i}-
+n\ln\frac{<c',x>}{<c',a_0>}=\label{eq:3}\\
+&&\sum_i\ln\frac{{a_0}_i}{x_i}\nonumber
+%\end{aligned}
+\end{eqnarray}
+
+\begin{problem}
+Доказать:
+$\forall x \in B(a_0,\alpha r) \text{ в } \mathbb{R}^n$
+$$\left|{\sum_{1 \leq i \leq n}\ln\frac{{a_0}_i}{x_i}}\right|
+\leq
+\frac{\beta^2}{2(1-\beta)}, \quad \text{ где } 
+\beta=\alpha\sqrt{\frac{n}{n-1}}.$$
+\end{problem}
+
+Пользуясь этим результатом и равенством (\ref{eq:3}), получаем из 
+(\ref{eq:2}):
+\begin{eqnarray*}
+&&f'(a_0)-f'(b') \quad \geq \quad
+\ln(1+\alpha)-\frac{\beta^2}{1-\beta} \quad =\\
+&&\ln(1+\alpha)-\frac{\alpha^2 n}{(n-1)(1-\alpha\sqrt{\frac{n}{n-1}})}
+\quad \overset{n \rightarrow \infty}{\longrightarrow} \quad  
+\alpha - \frac{\alpha^2}{2}-\frac{\alpha^2}{1-\alpha} > 0.
+\end{eqnarray*}
+\end{proof}
+\end{lemma}
+
+Из леммы \ref{lemma:2} вытекает, что если $f'$ не уменьшается 
+на каком-то шаге алгоритма, то задача решения не имеет. 
+
+
+Если же мы хотим найти внутреннюю точку, в которой значение 
+целевой функции
+достаточно мало для того, чтобы найти решение (см. схему алгоритма),
+сколько итераций должен произвести алгоритм? 
+Это будет ясно из следующей леммы.
+
+\begin{lemma}\label{lemma:3}
+Пусть $x$ --- точка, найденная с помощью алгоритма \ref{alg:0} за $k$ шагов, 
+$$k=O\left(n(q+\ln n)\right) \quad \Rightarrow \quad
+\frac{<c,x>}{<c,a_0>}\leq 2^{-q}.$$
+
+\begin{proof}
+$$\sum_i\ln\frac{<c,x>}{x_i}\leq
+\sum_i\ln\frac{<c,a_0>}{{a_0}_i}-k\delta$$
+$$n\ln\frac{<c,x>}{<c,a_0>}\leq\sum_i\ln x_i-\sum_i\ln {a_0}_i -
+k\delta \leq n\ln n - k\delta$$
+$$\ln\frac{<c,x>}{<c,a_0}\leq\ln n - \frac{k}{n}\delta \quad
+\Rightarrow \quad
+\frac{<c,x>}{<c,a_0>}\leq\frac{n}{e^{\frac{k}{n}\delta}}=
+\frac{n}{e^{O(\delta(q+\ln n))}}\leq \frac{1}{e^{const\cdot \delta q}}$$
+\end{proof}
+\end{lemma}
+
+Легко видеть, что тем самым необходимое количество итераций полиномиально
+от длины входа, т.е., мы предъявили полиномиальный алгоритм для задачи
+линейного программирования.
+Если аккуратно разобраться с вычислениями на каждом шаге 
+(упражнение по линейной алгебре), 
+можно убедиться, что трудоёмкость алгоритма составляет
+$O\left(n^{3.5}\cdot p(L)\right)$, где $p(L)$ --- полином от общей 
+длины входа алгоритма.
+
+\end{document}

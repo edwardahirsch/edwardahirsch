@@ -1,0 +1,151 @@
+\documentclass[12pt,a4paper]{article}
+\pagestyle{empty}
+\usepackage[russian]{babel}
+\usepackage[koi8-r]{inputenc}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{fullpage}
+%\textwidth=17cm 
+\pagestyle{empty} 
+%\oddsidemargin =-30pt
+%\topmargin=-30pt \textheight=1000pt
+%
+\newcommand\vhdef2
+\newcommand{\hdef}[1]{{\renewcommand\vhdef2{\bfseries{#1}}\renewcommand\vhdef1}}
+\newcommand{\class}[1]{{\ifnum\vhdef=2\mathbf{#1}\else\mathrm{#1}\fi}}
+\newcommand{\co}{
+\ifnum\vhdef=2\mathbf{co\,}\else\mathrm{co\hspace{2pt}}\fi
+\ifnum\vhdef=2\textbf{-}\else\textrm{-}\fi
+}
+%
+\newcommand{\lang}[1]{\mathtt{#1}}
+\newcommand{\func}[1]{{\mathtt{\widetilde{#1}}}}
+\newcommand{\funclass}[1]{{\class{\widetilde{#1}}}}
+\newcommand{\SAT}{\lang{SAT}}
+\newcommand{\BH}{\lang{BH}}
+\newcommand{\sSAT}{\func{SAT}}
+\newcommand{\sBH}{\func{BH}}
+\newcommand{\MAJSAT}{\lang{MAJ}\mbox{\tt-}\lang{SAT}}
+\newcommand{\QBF}{\lang{QBF}}
+%
+\newcommand{\Size}[1]{\class{Size}[#1]}
+\newcommand{\DSpace}[1]{\class{DSpace}[#1]}
+\newcommand{\NSpace}[1]{\class{NSpace}[#1]}
+\newcommand{\DTime}[1]{\class{DTime}[#1]}
+\newcommand{\RTime}[1]{\class{RTime}[#1]}
+\newcommand{\UTime}[1]{\class{UTime}[#1]}
+\newcommand{\OTime}[1]{\class{\oplus Time}[#1]}
+\newcommand{\NTime}[1]{\class{NTime}[#1]}
+\newcommand{\BPTime}[1]{\class{BPTime}[#1]}
+\newcommand{\heurBPTime}[2]{\class{heur_{#1}\textbf{-}BPTime}[#2]}
+\newcommand{\BQTime}[1]{\class{BQTime[#1]}}
+%
+\renewcommand{\P}{\class{P}}
+\newcommand{\sP}{\funclass{P}}
+\newcommand{\sharpP}{\class{\#P}}
+\newcommand{\Ppoly}{\class{P}/\class{poly}}
+\newcommand{\LOG}{\class{LOG}}
+\newcommand{\ZPP}{\class{ZPP}}
+\newcommand{\RP}{\class{RP}}
+\newcommand{\coRP}{\class{{\co}RP}}
+\newcommand{\UP}{\class{UP}}
+\newcommand{\coUP}{\class{{\co}UP}}
+\newcommand{\FewP}{\class{FewP}}
+\newcommand{\coFewP}{\class{{\co}FewP}}
+\newcommand{\Few}{\class{Few}}
+%
+\newcommand{\NP}{\class{NP}}
+\newcommand{\coNP}{\class{{\co}NP}}
+\newcommand{\sNP}{\funclass{NP}}
+\newcommand{\SigmaP}[1]{\Sigma^{#1}\class{P}}
+\newcommand{\NC}{\class{NC}}
+%
+\newcommand{\PiP}[1]{\Pi^{#1}\class{P}}
+\newcommand{\DeltaP}[1]{\Delta^{#1}\class{P}}
+\newcommand{\BPP}{\class{BPP}}
+\newcommand{\EQP}{\class{EQP}}
+\newcommand{\RQP}{\class{RQP}}
+\newcommand{\BQP}{\class{BQP}}
+\newcommand{\PH}{\class{PH}}
+\newcommand{\PCP}{\class{PCP}}
+%
+\newcommand{\OP}{\class{\oplus P}}
+\newcommand{\AWPP}{\class{AWPP}}
+\newcommand{\PP}{\class{PP}}
+\newcommand{\IP}{\class{IP}}
+\newcommand{\PSPACE}{\class{PSPACE}}
+%
+\newcommand{\EXP}{\class{EXP}}
+\newcommand{\MIP}{\class{MIP}}
+\newcommand{\NEXP}{\class{NEXP}}
+\newcommand{\coNEXP}{\class{{\co}NEXP}}
+%
+\newcommand{\BPO}{\class{BP}\cdot}
+\newcommand{\OPO}{\class{OP}\cdot}
+%
+\newcommand{\PEXP}{\class{PEXP}}
+\newcommand{\EXPSPACE}{\class{EXPSPACE}}
+\newcommand{\MAEXP}{\class{MA}_\class{EXP}}
+\newcommand{\MA}{\class{MA}}
+\newcommand{\AM}{\class{AM}}
+%
+\newcommand{\vs}{=\!\!\!?\!\!\!\!=}
+\newcommand{\Retc}{и\;т.\;д.}
+\newcommand{\poly}{\mathrm{poly}}
+%
+%\newcommand{\ournote}[1]{\ref{?}\footnote{#1}}
+%
+\begin{document}
+
+\begin{center}
+\textbf{\large{Программа спецкурса \emph{``Теория сложности алгоритмов''}}}
+\par \emph{(зима 2006/7 г., лектор Э.А.Гирш)}
+\end{center}
+\par \phantom{a} \par
+
+\normalsize{
+
+\begin{enumerate}
+\item Массовая задача. Классы $\sP$, $\sNP$, $\P$, $\NP$.
+Три определения недетерминированной машины Тьюринга.
+Сведения по Левину, Карпу и Тьюрингу, полные и трудные языки.
+Задача об ограниченной остановке ($\sBH$), ее $\sNP$-полнота.
+Задачи $\SAT$, $\sSAT$.
+\item Сведение задачи поиска к задаче распознавания для $\NP$-полных
+языков. Оптимальный алгоритм Левина. Теорема о существовании $\NP$-полного
+языка, не принадлежащего $\P$.
+\item Редкие и унарные языки. Теоремы об NP-трудности унарных и co-NP-трудности
+редких языков по Карпу.
+\item Вычисления с оракулами. Операторы Шонинга.
+Классы языков $\OP$, $\UP$, $\PP$, $\BPP$, $\RP$, $\SigmaP{k}$,
+$\DeltaP{k}$, $\PSPACE$, $\co{}$классы.
+Пример языка из $\RP$, для которого неизвестен
+алгоритм из $\P$. Уменьшение вероятности ошибки в $\RP$ и $\BPP$.
+Три определения полиномиальной иерархии и
+необходимое и достаточное условие ее коллапса.
+\item Определение языка $\QBF$ и его $\PSPACE$-полнота. 
+\item Определения классов $\DSpace{f}$, $\NSpace{f}$, теоремы о замкнутости
+относительно дополнения и о моделировании $\NSpace{f}$ при помощи $\DSpace{f}$.
+\item Определение классов $\DTime{f}$ и $\NTime{f}$. Теоремы об иерархии для них и для $\DSpace{f}$.
+\item Эвристические классы, доказательство теоремы об иерархии по
+времени для $\heurBPTime{\delta}{n^k}$.
+\item Булевы схемы и неравномерные вычисления.
+Теоремы $\BPP\subseteq \Ppoly$ и
+$\NP \subseteq \Ppoly \Rightarrow \PH = \SigmaP{2}$.
+\item Интерактивные доказательства ($\IP$, $\MA$, $\AM$).
+Примеры. Доказательство $\MA\subseteq\AM$, $\MA\subseteq\PP$.
+\item Три определения класса $\ZPP$.
+Доказательство $\BPP\subseteq \exists \bullet \BPP
+\subseteq \NP^{\BPP} \subseteq \MA_2 = \MA \subseteq \ZPP^{\NP}
+\subseteq \SigmaP{2} \bigcap \PiP{2}$.
+\item $\NP \subseteq \BPP \Rightarrow \SigmaP{2} \subseteq \BPP$.
+\item Теорема Шамира: $\IP=\PSPACE$.
+\item Теорема Тода: $\PH\subseteq \P^{\sharpP}=\P^{\PP}$.
+\item Класс $\sharpP$. Протокол LFKN. Доказательство
+$\PP\not\subseteq\Size{n^k}$, $\SigmaP{2}\cap\PiP{2}\not\subseteq\Size{n^k}$.
+Теорема Нечипорука.
+
+\end{enumerate}
+}
+
+\end{document}

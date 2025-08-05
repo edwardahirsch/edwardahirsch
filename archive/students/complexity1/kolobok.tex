@@ -1,0 +1,38 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage{fullpage}
+\advance\textwidth by 1cm
+\newcommand{\class}[1]{\mathbf{#1}}
+\renewcommand{\P}{\class{P}}
+\newcommand{\NP}{\class{NP}}
+\newcommand{\PSPACE}{\class{PSPACE}}
+\newcommand{\NPSPACE}{\class{NPSPACE}}
+\newcommand{\RP}{\class{RP}}
+\newcommand{\coRP}{\class{co\mbox{-}RP}}
+\newcommand{\BPP}{\class{BPP}}
+\newcommand{\ZPP}{\class{ZPP}}
+\newcommand{\Ppoly}{\class{P/poly}}
+\newcommand{\PH}{\class{PH}}
+\newcommand{\IP}{\class{IP}}
+\newcommand{\DTIME}{\mathbf{DTIME}}
+\begin{document}
+\thispagestyle{empty}
+\centerline{\Large Structural Computational Complexity}
+\centerline{\small 1st Colloquium}
+\begin{enumerate}
+\item There is a polynomial $p$ such that for every ``good'' function $f$,  
+      $\DTIME(f(n)) \neq \DTIME(p(f(n)))$.
+\item SAT is $\NP$-complete.
+\item If $\P\neq \NP$, then $\NP\setminus \P$ contains a non-$\NP$-complete set.
+\item $\PSPACE=\NPSPACE$.
+\item Valiant and Vazirani's lemma:
+      For any language $L$ containing all uniquely satisfiable Boolean formulas
+      and containing no unsatisfiable ones, 
+      there is a randomized reduction from SAT to $L$.
+\item PRIMES $\in \coRP$.
+\item $\BPP\subseteq\Sigma_2\P$.
+\item $\BPP\subseteq\Ppoly$.
+\item If SAT $\in \Ppoly$, then $\PH$ collapses to the second level.
+\item $\IP=\PSPACE$.
+\end{enumerate}
+\end{document}
+

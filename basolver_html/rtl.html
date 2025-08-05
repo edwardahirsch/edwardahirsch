@@ -1,0 +1,133 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+  <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+  <TITLE>BASolver: ISCAS/RTL format</TITLE>
+<body>
+<h2>BASolver</h2>
+
+<table>
+<tr>
+<td width=150 valign=top>
+<p>
+<a href=index.html>Home</a><br>
+<a href=download.html>Download</a><br>
+<a href=compilation.html>Compilation</a><br>
+<a href=using.html>Usage</a><br>
+<a href=dimacs.html>DIMACS format</a><br>
+ISCAS/RTL format<br>
+</td>
+<td width=3 valign=top><img width=1 height=250 src="spacer.gif" alt=""></td>
+<td width=500 valign=top>
+
+<h3>ISCAS and RTL formats</h3>
+
+<p>
+These two formats allow to conveniently encode arithmetic circuits. 
+The RTL format is designed as an extension of the ISCAS format. 
+Its difference from the ISCAS format is in the possibility to work 
+with multi-bit variables (thus, ISCAS format does not allow NUM, SUM, MULT gates)
+and with CLAUSE gate. Below we provide the description of the RTL format. 
+
+<p>
+Accepted gates: INPUT, OUTPUT, BUFF, NOT, AND, NAND, OR, NOR, XOR, 
+		XNOR, CLAUSE, MULT, SUM, NUM.
+
+<p>
+MULT, SUM, and NUM gates accept multi-bit variables, while all other 
+gates work with bit variables only. 
+Restrictions on variable names are the following: variable name should 
+not start with '_' or contain one of the characters ',', ')', '(', '='; 
+gate name cannot be used as a variable name.
+A multi-bit variable can appear in the right 
+hand side of an equality iff it appears in the left hand side of some previous
+equality (this condition is needed for calculating the number of bits in 
+resulting multi-bit variable). The number of bits in the sum of two multi-bit 
+variables is equal to the maximum number of bits in these variables plus 1, 
+the number of bits in the product is just a sum of these numbers. A variable 
+cannot appear in the left hand side of an equality more than once (the only
+exception is an appearance in the left-hand side of the NUM bit). Empty lines
+in an input file are not allowed. Comments start with '#' (comments can start
+only at the beginning of a string).
+
+<p>
+Semantics:
+
+<p><table>
+<tr><td width=150>INPUT(x)</td><td>x is an input bit of a circuit</td></tr>
+<tr><td valign=top>OUTPUT(x)</td><td>x is an output bit of a circuit</td></tr>
+<tr><td valign=top>CLAUSE(x1, ..., xk)</td><td>at least one of the variables x1, ..., xk has value True</td></tr>
+<tr><td valign=top>x = BUFF(y)</td><td>x = y, where x and y are bits</td></tr>
+<tr><td valign=top>x = NOT(y)</td><td>x = 1 - y, where x and y are bits</td></tr>
+<tr><td valign=top>x = AND(y, z)</td><td>x = (y and z), where x, y, and z are bits</td></tr>
+<tr><td valign=top>x = OR(y, z)</td><td>x = (y or z), where x, y, and z are bits</td></tr>
+<tr><td valign=top>x = XOR(y, z)</td><td>x = (y xor z), where x, y, and z are bits</td></tr>
+<tr><td valign=top>x = NUM(y1, ..., yk)</td><td>x is a k-bit variable consisting of bits y1, ..., yk, 
+			where y1 is the parity bit</td></tr>
+<tr><td valign=top>x = SUM(y, z)</td><td>x = y + z, where x, y, and z are multi-bit variables, 
+			such that the number of bits in y and z are known (that is, 
+			y and z have to appear in the left hand side of some previous 
+			equality with gate SUM, MULT, or NUM)</td></tr>
+<tr><td valign=top>x = MULT(y, z)</td><td>x = yz, where x, y, and z are multi-bit variables, such that 
+			the number of bits in y and z are known (that is, y and z 
+			have to appear in the left hand side of some previous equality 
+			with gate SUM, MULT, or NUM)</td></tr>
+</table>
+			
+<p>			
+ISCAS sample file:
+
+<pre>
+#
+# A circuit representing the standard full adder
+# 
+INPUT(a)			
+INPUT(b)			
+INPUT(c)			
+n = AND(b, c)
+m = AND(a, c)
+l = AND(a, b)
+k = XOR(a, b)
+e = OR(l, m)
+sum = XOR(k, c)
+CARRY = OR(e, n)
+OUTPUT(sum)
+OUTPUT(carry)
+</pre>
+
+<p>
+RTL sample file:
+
+<pre>
+#
+# An RTL specification for (x+y)*z for 2-bit inputs x, y, and z
+#
+INPUT(x0)
+INPUT(x1)
+INPUT(y0)
+INPUT(y1)
+INPUT(z0)
+INPUT(z1)
+#
+x = NUM(x0,x1)
+y = NUM(y0,y1)
+z = NUM(z0,z1)
+#
+s = SUM(x, y)
+#
+m = MULT(s, z)
+m = NUM(m0, m1, m2, m3, m4)
+#
+OUTPUT(m0)
+OUTPUT(m1)
+OUTPUT(m2)
+OUTPUT(m3)
+OUTPUT(m4)
+</pre>
+
+</td>
+
+</tr>
+</table>
+
+</body>
+</html>
