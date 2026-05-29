@@ -1,0 +1,408 @@
+\documentclass[12pt,fleqn,a4paper]{book}
+% 
+% Packages used:
+%
+\usepackage[koi8-r]{inputenc}
+\usepackage[russian,english]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{fullpage}
+\makeatletter
+\def\@listI {\leftmargin\leftmarginii
+              \labelwidth\leftmarginii
+              \advance\labelwidth-\labelsep
+              \topsep0pt
+              \parsep0pt
+              \itemsep0pt}
+\def\@listii {\leftmargin\leftmarginii
+              \labelwidth\leftmarginii
+              \advance\labelwidth-\labelsep
+              \topsep0pt
+              \parsep0pt
+              \itemsep0pt}
+\def\@listiii{\leftmargin\leftmarginiii
+              \labelwidth\leftmarginiii
+              \advance\labelwidth-\labelsep
+              \topsep0pt
+              \parsep0pt
+              \partopsep0pt
+              \itemsep0pt}
+\def\@listiv {\leftmargin\leftmarginiv
+              \labelwidth\leftmarginiv
+              \advance\labelwidth-\labelsep}
+\def\@listv  {\leftmargin\leftmarginv
+              \labelwidth\leftmarginv
+              \advance\labelwidth-\labelsep}
+\def\@listvi {\leftmargin\leftmarginvi
+              \labelwidth\leftmarginvi
+              \advance\labelwidth-\labelsep}
+\makeatother
+\advance\textheight by 20mm
+%
+% Common customization:
+%
+\pagestyle{headings}
+\newtheorem{theorem}{Теорема}[chapter]
+\newtheorem{question}{Открытый вопрос}[chapter]
+\newtheorem{lemma}{Лемма}[chapter]
+\newtheorem{corollary}{Следствие}[chapter]
+\newtheorem{proposition}{Утверждение}[chapter]
+\newtheorem{fact}{Факт}[chapter]
+\theoremstyle{definition}
+\newtheorem{problem}{Задача}[chapter]
+\newtheorem{exercise}{Упражнение}[chapter]
+\newtheorem{example}{Пример}[chapter]
+\newtheorem{definition}{Определение}[chapter]
+\newtheorem{remark}{Замечание}[chapter]
+\newtheorem{algorithm}{Алгоритм}[chapter]
+\def\gap{\medskip\centerline{\fbox{\Huge\bfseries{ПРОБЕЛ В КОНСПЕКТЕ.}}}\medskip}
+\advance\headheight by 7pt
+\def\headsep{15mm}
+\newcommand{\lecture}[2]{%
+\def\rightmark{\fbox{\parbox{125mm}{\lecturername: \coursetitle%
+\hfil\phantom{.}}}}
+\def\leftmark{\fbox{\parbox{125mm}{Лекция {#1}. {#2}%
+\hfil\phantom{.}}}}
+\renewcommand\chaptername{Лекция}\renewcommand\thechapter{#1}\chapter{{#2}}
+\thispagestyle{headings}}
+%
+% Things to customize for the course are here:
+%
+\newcommand\lecturername{Э. А. Гирш}
+\newcommand\coursetitle{``Информатика'' (отд. информатики, 1 курс)}
+%
+\newcommand{\Retc}{и\;т.\;д.}
+\newcommand{\poly}{\mathrm{poly}}
+%
+\newcommand{\ournote}[1]{\ref{?}\footnote{#1}}
+\renewcommand{\le}{\leqslant}
+\renewcommand{\ge}{\geqslant}
+\newcommand{\step}{\mathop{\longrightarrow}\limits}
+%
+\newcommand\vhdef2
+\newcommand{\hdef}[1]{{\renewcommand\vhdef2{\bfseries{#1}}\renewcommand\vhdef1}}
+\newcommand{\class}[1]{{\ifnum\vhdef=2\mathbf{#1}\else\mathrm{#1}\fi}}
+\newcommand{\lang}[1]{\mathtt{#1}}
+\newcommand{\NP}{\class{NP}}
+\newcommand{\sNP}{\class{\widetilde{NP}}}
+\newcommand{\RP}{\class{RP}}
+\newcommand{\sRP}{\class{\widetilde{RP}}}
+\renewcommand{\P}{\class{P}}
+\newcommand{\sP}{\class{\widetilde{P}}}
+\newcommand{\SAT}{\lang{SAT}}
+\renewcommand{\mod}{\mathrm{mod\ }}
+%
+% The document
+%
+\begin{document}
+\selectlanguage{russian}
+%
+% Lecture title
+%
+\lecture{9}{Конечные автоматы. Задача о подстроке}
+%
+\section{Формальные языки}
+        Будем называть \emph{алфавитом} произвольное  конечное множество (например, $\{0,1\}$ --- алфавит). Строкой в алфавите $\Sigma$ будет называться конечная последовательность его элементов (пустой строкой, обозначаемой $\epsilon$, будет называться последовательность из нуля элементов). Для строки $\alpha$ будем обозначать
+$\alpha_i$ (а иногда --- $\alpha[i]$) ее $i$-й символ, 
+$\alpha[i..j]$ --- ее подстроку с $i$-го по $j$-й символ включительно,
+а $|\alpha|$ --- ее длину (количество символов).
+
+\emph{Языком} в алфавите $\Sigma$ называется множество некоторых строк в алфавите $\Sigma$. Например: $\{\epsilon,1,00,01\}$. Или: $\{\underbrace{0\ldots0}_n\underbrace{1\ldots1}_n |n\in\mathbb{N}\}$.
+
+
+%-------------------------------------------------------------------------------
+\section{Конечные автоматы}\label{sec:FA}
+\emph{[Полностью определенный] детерминированный конечный автомат} --- упорядоченная пятерка
+$(Q,\Sigma,q_S,F,\delta)$,
+где 
+\begin{itemize}
+\item $Q$ --- конечное множество состояний,
+\item $\Sigma$ --- алфавит,
+\item $q_S\in Q$ --- стартовое состояние, 
+\item $F\subseteq Q$ --- множество конечных состояний, 
+\item $\delta:Q\times\Sigma\to Q$ --- функция перехода.
+\end{itemize}
+
+\bigskip\noindent
+Автомату дают строку в алфавите $\Sigma$;
+он, по очереди считывая ее символы,
+переходит из одного состояния в другое.
+Именно, считав символ $a\in\Sigma$,
+он переходит из текущего состояния $q$ (начинает он с $q=q_S$)
+в состояние $\delta(q,a)$.
+На следующем шаге он будет считывать следующий символ.
+Если, считав входную строку полностью,
+он попадает в одно из конечных состояний,
+то говорят, что автомат \emph{принимает} данную строку.
+Формально говоря, автомат принимает строку $s=s_1\ldots s_k$ (где $\forall i\ s_i\in\Sigma$),
+если существуют состояния $q_1$, $q_2$, \ldots, $q_{k+1}$,
+такие, что 
+$q_1=q_S$, $q_{k+1}\in F$ и 
+$\forall i\le k\ q_{i+1}=\delta(q_i,s_i)$.
+
+\bigskip\noindent
+Множество всех строк в алфавите $\Sigma$, принимаемых данным
+автоматом $\mathcal{A}$, называется \emph{языком, принимаемым
+(задаваемым) этим автоматом},
+и обозначается $L(\mathcal{A})$.
+
+%------------------------------------------------------------------------
+\section{Задача о поиске подстроки (pattern matching)}
+
+\paragraph{Задача:} даны строки $p$ (образец --- pattern) 
+и $t$ (текст --- text); $|p|=m$, $|t|=n$.
+Вопрос: встречается ли подстрока $p$ в строке $t$,
+то есть существует ли такое $i\ge1$, что
+$i+m-1\le n$ и $p=t_it_{i+1}\ldots t_{i+m-1}$?
+
+Тривиальный алгоритм работает $O(mn)$ шагов.
+Мы построим алгоритм, которому достаточно $O(m+n)$ шагов.
+
+\subsection{Конечный автомат для поиска заданного образца}
+
+\gap
+
+Чтобы построить этот автомат, к сожалению, мы потратим $O(m|\Sigma|)$ шагов
+(см. ниже), но это стоит сделать, если\footnote{Или если этот
+образец придется искать многократно в разных текстах:
+например, если в программе написано
+<<найдти подстроку ``error'' в строке \texttt{next\_string}>>.} $m|\Sigma| < n$,
+поскольку исполнение
+конечного автомата делается за линейное количество шагов
+с чрезвычайно небольшой константой в $O(\cdot)$ и
+весьма эффективной реализацией каждого шага.
+
+\subsection{Линейный алгоритм}
+
+В алгоритме нам понадобится <<таблица откатов>> $\Pi$,
+\[
+\Pi[q]=\max\{k\;|\; k<q ,\ \mbox{$p[1..k]$ --- суффикс $p[1..q]$\}}
+\]
+(если таких $k$ нет, $\Pi[q]=0$).
+(Заметим, что $p[1..k]$ --- суффикс $p[1..q]$, если $p[1]\ldots p[k]=p[q\!-\!k\!+\!1]\ldots p[q]$.)
+Как вычислить эту таблицу, мы узнаем чуть позже.
+
+\paragraph{Основной алгоритм.}
+У нас будет два <<указателя>> $q$ и $i$; первый указывает
+на текущий элемент образца; второй --- текста.
+\medskip
+
+\begin{itemize}
+\item[] $q:=1$;
+\item[] for $i:= 1$ to $n$ do
+\item[] begin
+\begin{itemize}
+\item[(*)] while $q>1$ and $p[q]\neq t[i]$ do $q:=\Pi[q-1]+1$;
+\item[] if $p[q]=t[i]$ then $q:=q+1$;
+\item[] if $q=m+1$ then <<Нашли!>>;
+\end{itemize}
+\item[] end;
+\end{itemize}
+
+\medskip
+Покажем, что этот алгоритм заканчивает свою работу за \mbox{$O(n)$} шагов.
+Сомнения может вызывать лишь строка (*),
+так как в ней имеется вложенный цикл.
+Однако, в ней уменьшается $q$.
+Увеличиться же оно может лишь $n$ раз (по одному разу для каждого $i$),
+причем всего на единицу.
+Следовательно, и тело цикла (*) не может выполниться более $n$ раз
+за все время работы алгоритма.
+
+\paragraph{Вычисление <<таблицы откатов>> $\Pi$.}
+У нас снова будет два <<указателя>> $k$ и $q$; на сей раз оба
+указывают на текущие элементы образца.
+\medskip
+
+\newpage
+\begin{itemize}
+\item[] $k:=1$;
+\item[] $\Pi[1]:=0$;
+\item[] for $q:=2$ to $m$ do 
+\item[] begin
+\begin{itemize}
+\item[] while $k>1$ and $p[k]\neq p[q]$ do $k:=\Pi[k-1]+1$;
+\item[] if $p[k]=p[q]$ then $k:=k+1$;
+\item[] $\Pi[q]:=k-1$;
+\end{itemize}
+\item[] end;
+\end{itemize}
+
+\medskip
+То, что таблица будет вычислена за $O(m)$ шагов,
+показывается аналогично тому, как это было сделано
+для основного алгоритма (только теперь мы следим
+за <<указателем>> $k$).
+
+\begin{remark}
+Эту таблицу откатов, разумеется, можно перестроить в
+упоминавшийся выше конечный автомат:
+\end{remark}
+
+\gap
+ 
+%----------------------------------------------------------------------
+\section{Конечные автоматы: продолжение}
+\emph{Регулярные языки} --- синоним для языков, принимаемых конечными
+автоматами (чуть позже мы увидим, почему).
+
+\begin{lemma}[лемма о разрастании для регулярных языков (pumping lemma)]
+Пусть $L$ --- регулярный язык.
+Тогда существует константа $c$,
+такая, что любую строку $x\in L$ длины не менее $c$
+можно разбить на три части $x=u\cdot v\cdot w$,
+такие что 
+$0<|v|\le c$ и
+$\forall i\ge0\ u\cdot v^i\cdot w \in L$.
+\end{lemma}
+\begin{proof}
+Рассмотрим детерминированный конечный
+полностью определенный автомат для языка $L$.
+Пусть $c=|Q|+1$.
+Посмотрим, как он работает на цепочке $x$:
+$q_s\to q_1\to \ldots \to q_k\in F$.
+На каждом шаге считывается некоторый символ.
+Поскольку $|x|\ge c$,
+мы должны были побывать в каком-то состоянии дважды,
+и в нашем пути есть циклы.
+Выберем несамопересекающийся цикл;
+пусть до первого прохождения по нему считывалась строка $u$,
+при прохождении по нему считывалась строка $v$
+(ее длина не превосходит $c$, поскольку цикл --- несамопересекающийся),
+а после прохождения по нему (в том числе, если по нему пошли еще раз) --- 
+строка $w$. Очевидно, наш автомат примет любую строку вида $uv^iw$.
+\end{proof}
+
+С помощью этой леммы можно доказывать, что какой-нибудь язык не является регулярным.
+\begin{example}
+$L=\{0^n1^n|n\in \mathbb{N}\cup{0}\}$ не является регулярным.\\
+\emph{Доказательство.}
+Пусть регулярный. Рассмотрим варианты подстроки $v$ из леммы.
+\begin{enumerate}
+\item
+В строку попадают только нули $\Rightarrow$
+в $uv^2w$ количество 0 увеличится,
+а количество 1 останется неизменным $\Rightarrow$ 
+строка не будет принадлежать $L$.
+\item
+В строку попадают только единицы --- аналогично.
+\item
+$v=0^i1^j$ $\Rightarrow$
+в $uv^2w$ после 1 будет идти 0
+$\Rightarrow$ строка опять не будет принадлежать языку.
+\end{enumerate}
+%(Замечание: тем не менее,
+%этот язык может быть порожден \emph{бесконтекстной}
+%грамматикой $S\to 0S1$, $S\to\epsilon$.)
+\qed
+\end{example}
+
+%--------------------------------------------------------------------
+\section{Регулярные выражения}
+        Определим \emph{регулярные выражения} в алфавите $\Sigma$. 
+Они будут определяться индуктивно:
+\begin{itemize}
+\item $\emptyset$ --- регулярное выражение;
+\item $\{\epsilon\}$ --- регулярное выражение;
+\item $\{a\}$ --- регулярное выражение (для каждого $a\in\Sigma$);
+\item Если $A$, $B$ --- регулярные выражения,
+ то $A\cup B$ --- тоже регулярное выражение;
+\item Если $A$, $B$ --- регулярные выражения,
+ то $A\cdot B$ --- тоже регулярное выражение;
+\item Если $A$ --- регулярное выражение,
+ то $A^*$ --- тоже регулярное выражение.
+\end{itemize}
+Это определение исчерпывает все возможные регулярные выражения.
+
+Каждое регулярное выражение определяет некоторый язык.
+Для большинства пунктов определения очевидно, какой язык
+имеется в виду; оставшиеся пункты:
+\begin{itemize}
+\item для данных языков $A$ и $B$ язык $A\cdot B$
+      состоит из строк вида $ab$, где $a\in A$, $b\in B$
+      (значок операции ``точка'' --- конкатенации строк --- часто опускается);
+\item $A^*=\{\epsilon\}\cup A\cup A\cdot A\cup A\cdot A\cdot A\ldots$
+      (все конечные $A\cdot\ldots\cdot A$).
+\end{itemize}
+
+Например, $(\{0\}\cup\{11\})^*\cdot\{000\}$ обозначает
+множество всех последовательностей нулей и пар единиц,
+заканчивающихся на три нуля.
+
+
+\begin{theorem}\label{th:regular}
+Множества языков, задаваемых
+\begin{enumerate}
+\item[(1)] конечными автоматами,
+\item[(2)] регулярными выражениями
+%\item[(3)] праволинейными грамматиками
+\end{enumerate}
+в одном и том же алфавите ${\Sigma}$, совпадают. 
+\end{theorem}
+
+\begin{problem}
+Доказать теорему~\ref{th:regular}.
+\end{problem}
+
+\section{Замкнутость регулярных языков относительно некоторых операций
+и разрешимые проблемы, связанные с регулярными языками}
+\paragraph{Полезные свойства.}
+\begin{enumerate}
+\item
+Множество всех регулярных языков в данном алфавите
+замкнуто относительно операций, которые их порождают: $\cup$, $\cdot$, ${}^*$.
+\item
+\begin{lemma}
+Множество всех регулярных языков в данном алфавите
+замкнуто относительно дополнения.
+\end{lemma}
+\begin{proof}
+Рассмотрим детерминированный конечный полностью определенный автомат, 
+задающий язык $L$.
+Поменяем местами его конечные состояния с остальными: $F':=Q\setminus F$.
+Полученный автомат задает язык $\overline{L}$.
+\end{proof}
+\item
+\begin{corollary}
+{\ldots}и замкнуто относительно пересечения.
+\end{corollary}
+\end{enumerate}
+
+\paragraph{Разрешимые проблемы.}
+\begin{enumerate}
+\item Принадлежность. 
+Рассмотрим детерминированный конечный
+полностью определенный автомат, принимающий данный язык.
+Чтобы узнать, принадлежит ли этому языку некоторая строка,
+запустим наш автомат на этой строке $x$.
+После $|x|$ переходов мы поймем, принадлежит ли она языку.
+\item Пустота языка.
+Чтобы решить эту проблему, достаточно
+проверить, достижимо ли какое-нибудь конечное
+состояние автомата из начального.
+Эта задача, очевидно, алгоритмически разрешима.
+\item Равенство языков.
+Чтобы построить алгоритм для этой задачи, достаточно заметить, что
+$$
+ L_1=L_2 \Leftrightarrow 
+ L_1 \mathrel{\cap} \overline{L_2}=\emptyset \mathrel{\land}
+ L_2 \mathrel{\cap} \overline{L_1}=\emptyset
+\mbox{ (или: $(L_1 \cap \overline{L_2})\cup(L_2 \cap \overline{L_1})=\emptyset$).}
+$$
+\item Включение языков.
+Чтобы построить алгоритм для этой задачи, достаточно заметить, что
+$$
+L_1\subseteq L_2 \Leftrightarrow (L_1 \cap\overline{L_2}=\emptyset) 
+\mbox{ (или: $(L_1 \cap L_2=L_1)$)}.
+$$
+\end{enumerate}
+
+\section{Простой алгоритм для поиска подстроки,
+использующий случайные числа}
+
+\gap
+
+\end{document}
+

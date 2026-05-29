@@ -1,0 +1,65 @@
+\documentclass[12pt]{article}
+\usepackage[koi8-r]{inputenc}
+\usepackage{fullpage,url}
+\usepackage[russian,english]{babel}
+\advance\topmargin by -5mm
+\advance\textheight by 15mm
+\advance\textwidth by 1cm 
+\begin{document}
+\selectlanguage{russian}
+\centerline{\large\bfseries 
+Программа экзамена по с/к\ \ {\sc Эффективные алгоритмы --- I}
+}
+\bigskip
+\begin{enumerate}
+\item Алгоритм Штрассена для умножения матриц (с доказательством теоремы
+      об уравнении $T(n)=a\cdot T(n/b)+cn^2$).
+\item Применение алгоритма Штрассена: обращение матриц, 
+      умножение булевых матриц. 
+\item Метод отпечатков пальцев: сравнение строк на расстоянии,
+      поиск подстроки, проверка умножения матриц. 
+\item Дискретное преобразование Фурье и его вычисление.
+\item Алгоритм Шенхаге-Штрассена для умножения чисел 
+      (без дискретного преобразования Фурье, но с теоремой
+      об отрицательно обернутой свертке). 
+\item Приближенный алгоритм для задачи о максимальном сечении, 
+      основанный на задаче полуопределенного программирования. 
+\item Метод Монте-Карло. Приближенный алгоритм подсчета мощности 
+      объединения множеств. 
+\item Алгоритм для задачи кэширования и оценка его качества. 
+\item Алгоритм для задачи о $k$ официантах: понятие рабочей функции, 
+      сам алгоритм, свойства рабочих функций. 
+\item Алгоритм для задачи о $k$ официантах: оценка его качества 
+      при помощи обобщенной стоимости (без свойств рабочих функций).
+\item Алгоритм определения расстояний между всеми парами вершин графа. 
+\item Алгоритм нахождения кратчайших путей между всеми парами вершин графа
+      (без алгоритма определения матрицы расстояний, но с алгоритмом нахождения
+      матрицы ``свидетелей'' для булевых матриц).
+\end{enumerate}
+
+\bigskip
+\centerline{\bfseries Основной источник} 
+\medskip
+\noindent{}Конспект лекций, 
+\url{http://logic.pdmi.ras.ru/~hirsch/students/index.html}
+\smallskip
+
+\bigskip
+\centerline{\bfseries Дополнительная литература:}
+\smallskip
+\begin{enumerate}
+\item А.Ахо, Дж.Хопкрофт, Дж.Ульман 
+    ``Построение и анализ вычислительных алгоритмов''.
+    М.: Мир, 1979.
+\item R.Motwani, P.Raghavan, ``Randomized Algorithms''.
+    Cambridge University Press, 1995.
+\item M.X. Goemans and D.P. Williamson, ``Improved Approximation
+    Algorithms for Maximum Cut and Satisfiability Problems Using 
+    Semidefinite Programming'', Journal of the ACM, 42, 1115--1145, 1995.\\
+    \url{ftp://theory.lcs.mit.edu/pub/people/goemans/maxcut-JACM.ps}
+\item E.Koutsoupias and C. Papadimitriou. ``On the $k$-server conjecture'',
+    Journal of the ACM, 42(5):971--983, 1995.\\
+    \url{http://www.cs.ucla.edu/~elias/publications/paper-kp95.ps}
+\end{enumerate}
+\end{document}
+

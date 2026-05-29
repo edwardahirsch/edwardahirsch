@@ -1,0 +1,5 @@
+Disallow: lecture1.dvi
+Disallow: lecture1.pdf
+Disallow: lecture1.ps
+Disallow: lecture1.tex
+Disallow: lecture1z.ps.gz
